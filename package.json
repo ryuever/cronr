@@ -1,0 +1,37 @@
+{
+  "name": "cronr",
+  "version": "1.0.0",
+  "description": "Time-based job scheduler",
+  "main": "lib/cronr.cjs.js",
+  "module": "lib/cronr.es.js",
+  "files": [
+    "lib",
+    "src",
+    "index.js"
+  ],
+  "scripts": {
+    "build": "rimraf lib && rollup -c --environment INCLUDE_DEPS,BUILD:production",
+    "test": "jest"
+  },
+  "author": "youchao.liu",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "jest": "^21.2.1",
+    "regenerator-runtime": "^0.11.1",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.52.1",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-typescript": "^0.8.1",
+    "ts-jest": "^21.2.4",
+    "typescript": "^2.6.2"
+  }
+}
