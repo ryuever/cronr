@@ -1,18 +1,30 @@
 const isString = (str) => typeof str === 'string';
 const isDefined = (str) => typeof str !== 'undefined';
 
+const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const monthes = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
+
 const twoDigital = /^(\d{1,2})$/;
 const numberRange = /^(\d+)-(\d+)$/;
-const weekday = /(Mon|Tue|Wed|Thu|Fri|Sat|Sun)/;
-const month = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/;
+const asterisk = /^(\*)(?:\/([0-9]*))?$/;
+const oneWithSlash = /^(\d{1,2})\/([0-9]*)$/;
+const twoNumberWithSlash = /^(\d+)-(\d+)\/([0-9]*)$/;
+const weekday = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:-(Mon|Tue|Wed|Thu|Fri|Sat|Sun))?$/;
+const month = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))?/;
+
+const weekdayToNumber = str => weekdays.indexOf(str);
+const monthToNumber = str => monthes.indexOf(str)
 
 const patterns = Object.create(null);
-patterns.second = combinePatterns([twoDigital, numberRange]);
-patterns.minute = combinePatterns([twoDigital, numberRange]);
-patterns.hour = combinePatterns([twoDigital, numberRange]);
-patterns.day = combinePatterns([twoDigital, numberRange]);
-patterns.month = combinePatterns([twoDigital, numberRange]);
-patterns.weekday = combinePatterns([twoDigital, numberRange]);
+patterns.second = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
+patterns.minute = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
+patterns.hour = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
+patterns.day = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
+patterns.month = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash, month]);
+patterns.weekday = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash, weekday]);
 
 function combinePatterns(patterns) {
   return (str) => {
@@ -26,19 +38,95 @@ function combinePatterns(patterns) {
 }
 
 const extractors = Object.create(null);
+
 extractors[twoDigital] = (str) => {
-  const [, value ] = twoDigital.exec(str);
-  return {
-    literal: parseInt(value),
-  };
+  const result = twoDigital.exec(str);
+  if (result) {
+    const [, value ] = result;
+    return {
+      literal: parseInt(value),
+    };
+  }
+  return null;
 };
+
 extractors[numberRange] = (str) => {
-  const [, from, to ] = numberRange.exec(str);
-  return {
-    from: parseInt(from),
-    to: parseInt(to),
-  };
+  const result = numberRange.exec(str);
+  if (result) {
+    const [, from, to ] = result;
+    return {
+      from: parseInt(from),
+      to: parseInt(to),
+    };
+  }
+  return null;
 };
+
+extractors[asterisk] = (str) => {
+  const result = asterisk.exec(str);
+  if (result) {
+    const [, , value] = result;
+    // if (value) return { type: 'every', value: value };
+    // return { type: 'every', value: '1' };
+    if (value) return {
+      every: parseInt(value)
+    };
+    return { every: 1 };
+  }
+}
+
+extractors[oneWithSlash] = (str) => {
+  const result = oneWithSlash.exec(str);
+  if (result) {
+    const [, from, value] = result;
+    // return { type: 'every', value: '1' };
+    return {
+      every: parseInt(value),
+      from: parseInt(from)
+    }
+  }
+}
+
+extractors[twoNumberWithSlash] = (str) => {
+  const result = twoNumberWithSlash.exec(str);
+  if (result) {
+    const [,from , to, value] = result;
+    return {
+      every: parseInt(value),
+      from: parseInt(from),
+      to: parseInt(to),
+    };
+  }
+}
+
+extractors[weekday] = (str) => {
+  const result = weekday.exec(str);
+  if (result) {
+    const [, from, to, value] = result;
+
+    if (to) return {
+      from: weekdayToNumber(from),
+      to: weekdayToNumber(to),
+    }
+    return {
+      literal: weekdayToNumber(from),
+    };
+  }
+}
+
+extractors[month] = (str) => {
+  const result = month.exec(str);
+  if (result) {
+    const [, from, to, value] = result;
+    if (to) return {
+      from: monthToNumber(from),
+      to: monthToNumber(to),
+    }
+    return {
+      literal: monthToNumber(from),
+    };
+  }
+}
 
 function normalize(items) {
   const literals = [];
@@ -49,6 +137,7 @@ function normalize(items) {
     const { type, value } = item;
 
     if (type === 'literal') literals.push(item);
+    if (type === 'every') literals.push(item);
 
     if (type === 'from') {
       from ? from.value < value ? from = item : null : from = item;
@@ -81,7 +170,7 @@ export function parse(string, unit) {
   const draftValues = arr.reduce((mergedValue, cur) => {
     const pattern = patterns[unit];
     const result = pattern(cur);
-    const { from, to, literal } = result;
+    const { from, to, literal, every } = result;
 
     isDefined(from) && mergedValue.push({
       type: 'from', value: from,
@@ -93,6 +182,10 @@ export function parse(string, unit) {
 
     isDefined(literal) && mergedValue.push({
       type: 'literal', value: literal,
+    })
+
+    isDefined(every) && mergedValue.push({
+      type: 'every', value: every,
     })
 
     return mergedValue;
