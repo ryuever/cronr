@@ -1,6 +1,10 @@
 const isString = (str) => typeof str === 'string';
 const isDefined = (str) => typeof str !== 'undefined';
 
+import { LITERAL, RANGE, EVERY } from './types';
+
+const toInt = int => parseInt(int);
+
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthes = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -12,8 +16,8 @@ const numberRange = /^(\d+)-(\d+)$/;
 const asterisk = /^(\*)(?:\/([0-9]*))?$/;
 const oneWithSlash = /^(\d{1,2})\/([0-9]*)$/;
 const twoNumberWithSlash = /^(\d+)-(\d+)\/([0-9]*)$/;
-const weekday = /^(Mon|Tue|Wed|Thu|Fri|Sat|Sun)(?:-(Mon|Tue|Wed|Thu|Fri|Sat|Sun))?$/;
-const month = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(?:-(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))?/;
+const weekday = RegExp(`^(${weekdays.join('|')})(?:-(${weekdays.join('|')}))?$`)
+const month = RegExp(`^(${monthes.join('|')})(?:-(${monthes.join('|')}))?$`)
 
 const weekdayToNumber = str => weekdays.indexOf(str);
 const monthToNumber = str => monthes.indexOf(str)
@@ -44,7 +48,8 @@ extractors[twoDigital] = (str) => {
   if (result) {
     const [, value ] = result;
     return {
-      literal: parseInt(value),
+      type: LITERAL,
+      value: toInt(value),
     };
   }
   return null;
@@ -55,8 +60,11 @@ extractors[numberRange] = (str) => {
   if (result) {
     const [, from, to ] = result;
     return {
-      from: parseInt(from),
-      to: parseInt(to),
+      type: RANGE,
+      value: {
+        from: toInt(from),
+        to: toInt(to),
+      },
     };
   }
   return null;
@@ -66,12 +74,14 @@ extractors[asterisk] = (str) => {
   const result = asterisk.exec(str);
   if (result) {
     const [, , value] = result;
-    // if (value) return { type: 'every', value: value };
-    // return { type: 'every', value: '1' };
     if (value) return {
-      every: parseInt(value)
+      type: EVERY,
+      value: toInt(value)
     };
-    return { every: 1 };
+    return {
+      type: EVERY,
+      value: 1,
+    };
   }
 }
 
@@ -79,24 +89,31 @@ extractors[oneWithSlash] = (str) => {
   const result = oneWithSlash.exec(str);
   if (result) {
     const [, from, value] = result;
-    // return { type: 'every', value: '1' };
-    return {
-      every: parseInt(value),
-      from: parseInt(from)
-    }
+    return [
+      { type: EVERY, value: toInt(value) },
+      { type: RANGE, value: {
+        from: toInt(from),
+      }}
+    ]
   }
 }
 
 extractors[twoNumberWithSlash] = (str) => {
   const result = twoNumberWithSlash.exec(str);
   if (result) {
-    const [,from , to, value] = result;
-    return {
-      every: parseInt(value),
-      from: parseInt(from),
-      to: parseInt(to),
-    };
+    const [, from, to, value] = result;
+    return [
+      { type: EVERY, value: toInt(value) },
+      { type: RANGE,
+        value: {
+          from: toInt(from),
+          to: toInt(to),
+        }
+      }
+    ];
   }
+
+  return [];
 }
 
 extractors[weekday] = (str) => {
@@ -105,11 +122,14 @@ extractors[weekday] = (str) => {
     const [, from, to, value] = result;
 
     if (to) return {
-      from: weekdayToNumber(from),
-      to: weekdayToNumber(to),
+      type: RANGE,
+      value: {
+        from: weekdayToNumber(from),
+        to: weekdayToNumber(to),
+      }
     }
     return {
-      literal: weekdayToNumber(from),
+      type: LITERAL, value: weekdayToNumber(from),
     };
   }
 }
@@ -119,77 +139,26 @@ extractors[month] = (str) => {
   if (result) {
     const [, from, to, value] = result;
     if (to) return {
-      from: monthToNumber(from),
-      to: monthToNumber(to),
+      type: RANGE,
+      value: {
+        from: monthToNumber(from),
+        to: monthToNumber(to),
+      }
     }
     return {
-      literal: monthToNumber(from),
+      type: LITERAL,
+      value: monthToNumber(from),
     };
   }
-}
-
-function normalize(items) {
-  const literals = [];
-  let from = null;
-  let to = null;
-
-  items.forEach((item) => {
-    const { type, value } = item;
-
-    if (type === 'literal') literals.push(item);
-    if (type === 'every') literals.push(item);
-
-    if (type === 'from') {
-      from ? from.value < value ? from = item : null : from = item;
-    }
-
-    if (type === 'to') {
-      to ? to.value > value ? to = item : null : to = item;
-    }
-  })
-
-  if (from && to && from.value > to.value) {
-    throw new Error('invalid time range');
-  }
-
-  if (from && to && from.value === to.value) {
-    literals.push({ type: 'literal', value: from.value });
-    from = null;
-    to = null;
-  }
-
-  return [literals, from, to].reduce((prev, cur) => {
-    if (cur) return prev.concat(cur);
-    return prev;
-  }, [])
 }
 
 export function parse(string, unit) {
   const arr = string.split(',');
 
-  const draftValues = arr.reduce((mergedValue, cur) => {
+  return arr.reduce((mergedValue, cur) => {
     const pattern = patterns[unit];
     const result = pattern(cur);
-    const { from, to, literal, every } = result;
 
-    isDefined(from) && mergedValue.push({
-      type: 'from', value: from,
-    })
-
-    isDefined(to) && mergedValue.push({
-      type: 'to', value: to,
-    })
-
-    isDefined(literal) && mergedValue.push({
-      type: 'literal', value: literal,
-    })
-
-    isDefined(every) && mergedValue.push({
-      type: 'every', value: every,
-    })
-
-    return mergedValue;
+    return mergedValue.concat(result);
   }, []);
-
-  return normalize(draftValues);
 }

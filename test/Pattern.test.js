@@ -1,4 +1,5 @@
 import Pattern from '../src/Pattern';
+import { LITERAL, RANGE, EVERY } from '../src/types';
 
 test('works with specified second pattern', () => {
   const pattern = Pattern.create('2,4-9,3-7 0 0 0 0 0');
@@ -13,9 +14,17 @@ test('works with specified second pattern', () => {
 
   const partsFromSecond = secondToken.formatToParts();
   expect(partsFromSecond).toEqual([
-    { type: 'literal', value: 2 },
-    { type: 'from', value: 4 },
-    { type: 'to', value: 7 }
+    { type: LITERAL, value: 2 },
+    { type: RANGE,
+      value: {
+        from: 4,
+        to: 9,
+    }},
+    { type: RANGE,
+      value: {
+        from: 3,
+        to: 7,
+    }}
   ]);
 })
 
@@ -32,15 +41,31 @@ test('works with specified second and minute mixed pattern', () => {
 
   const partsFromSecond = secondToken.formatToParts();
   expect(partsFromSecond).toEqual([
-    { type: 'literal', value: 2 },
-    { type: 'from', value: 4 },
-    { type: 'to', value: 7 }
+    { type: LITERAL, value: 2 },
+    { type: RANGE,
+      value: {
+        from: 4,
+        to: 9,
+    }},
+    { type: RANGE,
+      value: {
+        from: 3,
+        to: 7,
+    }}
   ]);
 
   const partsFromMinute = minuteToken.formatToParts();
-  expect(partsFromMinute).toEqual([
-    { type: 'from', value: 3 },
-    { type: 'to', value: 8 }
+  expect(partsFromMinute).toEqual([{
+    type: RANGE,
+    value: {
+      from: 2,
+      to: 8,
+  }},{
+    type: RANGE,
+    value: {
+      from: 3,
+      to: 9,
+    }}
   ]);
 })
 
@@ -57,12 +82,12 @@ test('with asterisk', () => {
 
   const partsFromSecond = secondToken.formatToParts();
   expect(partsFromSecond).toEqual([
-    { type: 'every', value: 1 },
+    { type: EVERY, value: 1 },
   ]);
 
   const partsFromMinute = minuteToken.formatToParts();
   expect(partsFromMinute).toEqual([
-    { type: 'every', value: 1 },
+    { type: EVERY, value: 1 },
   ]);
 })
 
@@ -79,7 +104,7 @@ test('with asterisk and slash', () => {
 
   const partsFromSecond = secondToken.formatToParts();
   expect(partsFromSecond).toEqual([
-    { type: 'every', value: 3 },
+    { type: EVERY, value: 3 },
   ]);
 })
 
@@ -96,9 +121,13 @@ test('number range and slash', () => {
 
   const partsFromSecond = secondToken.formatToParts();
   expect(partsFromSecond).toEqual([
-    { type: 'every', value: 3 },
-    { type: 'from', value: 7 },
-    { type: 'to', value: 8 },
+    { type: EVERY, value: 3 },
+    { type: RANGE,
+      value: {
+        from: 7,
+        to: 8,
+      }
+    }
   ]);
 })
 
@@ -115,7 +144,7 @@ test('test month', () => {
 
   const partsFromMonth = monthToken.formatToParts();
   expect(partsFromMonth).toEqual([
-    { type: 'literal', value: 0 },
+    { type: LITERAL, value: 0 },
   ]);
 })
 
@@ -131,10 +160,13 @@ test('test month range', () => {
   } = pattern;
 
   const partsFromMonth = monthToken.formatToParts();
-  expect(partsFromMonth).toEqual([
-    { type: 'from', value: 0 },
-    { type: 'to', value: 4 },
-  ]);
+  expect(partsFromMonth).toEqual([{
+    type: RANGE,
+    value: {
+      from: 0,
+      to: 4
+    }
+  }]);
 })
 
 test('test weekday', () => {
@@ -150,7 +182,7 @@ test('test weekday', () => {
 
   const partsFromWeekday = weekdayToken.formatToParts();
   expect(partsFromWeekday).toEqual([
-    { type: 'literal', value: 1 },
+    { type: LITERAL, value: 1 },
   ]);
 })
 
@@ -166,8 +198,11 @@ test('test weekday range', () => {
   } = pattern;
 
   const partsFromWeekday = weekdayToken.formatToParts();
-  expect(partsFromWeekday).toEqual([
-    { type: 'from', value: 0 },
-    { type: 'to', value: 5 },
-  ]);
+  expect(partsFromWeekday).toEqual([{
+    type: RANGE,
+    value: {
+      from: 0,
+      to: 5,
+    }
+  }]);
 })
