@@ -10,10 +10,6 @@ export default class Cronr {
     this.heartbeating = false;
   }
 
-  isValidCronPatter() {
-
-  }
-
   static buildId() {
     return `cronr-${singleton.count++}`;
   }
@@ -23,27 +19,7 @@ export default class Cronr {
     const id = Cronr.buildId();
 
     singleton.jobs[id] = new CronJob({ id, pattern, fn });
-    singleton.heartbeat();
 
     return singleton.jobs[id];
-  }
-
-  heartbeatTick() {
-    // ...
-  }
-
-  // inspired by
-  heartbeat() {
-    if (this.heartbeating) return;
-    this.heartbeating = true;
-
-    setTimeout(() => {
-      console.log('time out')
-    }, 1000);
-    raf(function tick() {
-      // Animation logic
-      console.log('tick');
-      raf(tick)
-    })
   }
 }

@@ -12,7 +12,6 @@ export default class Pattern {
     this.weekdayToken = Object.create(null);
 
     this.pattern = pattern;
-    this.times = Infinity;
   }
 
   static create(pattern) {
@@ -21,8 +20,22 @@ export default class Pattern {
     return instance;
   }
 
+  beginningUnitTokenToRestrict() {
+    let parts = this.patternParts();
+    const len = parts.length;
+    const unitLen = units.length;
+
+    const index = unitLen - len;
+
+    return this[`${units[index]}Token`];
+  }
+
+  patternParts() {
+    return this.pattern.split(' ');
+  }
+
   initToken() {
-    let parts = this.pattern.split(' ');
+    let parts = this.patternParts();
 
     const len = parts.length;
 
@@ -33,11 +46,5 @@ export default class Pattern {
     parts.forEach((part, i) =>
       this[`${units[i]}Token`] = Token.create(part, units[i])
     )
-  }
-
-  resolveOptions() {
-    return {
-      // watchUnit
-    }
   }
 }
