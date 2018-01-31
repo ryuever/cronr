@@ -12,6 +12,7 @@ const monthes = [
 ];
 
 const twoDigital = /^(\d{1,2})$/;
+const threeDigital = /^(\d{1,2})$/;
 const numberRange = /^(\d+)-(\d+)$/;
 const asterisk = /^(\*)(?:\/([0-9]*))?$/;
 const oneWithSlash = /^(\d{1,2})\/([0-9]*)$/;
@@ -23,6 +24,7 @@ const weekdayToNumber = str => weekdays.indexOf(str);
 const monthToNumber = str => monthes.indexOf(str)
 
 const patterns = Object.create(null);
+patterns.milliSecond = combinePatterns([threeDigital, numberRange, asterisk, twoNumberWithSlash]);
 patterns.second = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
 patterns.minute = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
 patterns.hour = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash]);
@@ -45,6 +47,18 @@ const extractors = Object.create(null);
 
 extractors[twoDigital] = (str) => {
   const result = twoDigital.exec(str);
+  if (result) {
+    const [, value ] = result;
+    return {
+      type: LITERAL,
+      value: toInt(value),
+    };
+  }
+  return null;
+};
+
+extractors[threeDigital] = (str) => {
+  const result = threeDigital.exec(str);
   if (result) {
     const [, value ] = result;
     return {

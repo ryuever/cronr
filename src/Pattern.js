@@ -3,6 +3,7 @@ import { units } from './Unit';
 
 export default class Pattern {
   constructor(pattern) {
+    this.milliSecondToken = Object.create(null);
     this.secondToken = Object.create(null);
     this.minuteToken = Object.create(null);
     this.hourToken = Object.create(null);
@@ -25,8 +26,9 @@ export default class Pattern {
 
     const len = parts.length;
 
-    if (len < 5 || len > 6) throw new Error('Invalid pattern');
-    if (len === 5) parts = ['*'].concat(parts);
+    if (len < 5 || len > 7) throw new Error('Invalid pattern');
+    if (len === 5) parts = ['*', '*'].concat(parts);
+    if (len === 6) parts = ['*'].concat(parts);
 
     parts.forEach((part, i) =>
       this[`${units[i]}Token`] = Token.create(part, units[i])

@@ -11,6 +11,7 @@ export default class CronJob {
     const patternInstance = Pattern.create(pattern);
 
     const {
+      milliSecondToken,
       secondToken,
       minuteToken,
       hourToken,
@@ -19,6 +20,7 @@ export default class CronJob {
       weekdayToken
     } = patternInstance;
 
+    this.milliSecondToken = milliSecondToken;
     this.secondToken = secondToken;
     this.minuteToken = minuteToken;
     this.hourToken = hourToken;
@@ -72,11 +74,19 @@ export default class CronJob {
     }
   }
 
-  ifDateUpdated(ts, nextTs) {
-    const tsDate = `${ts.getFullYear()}-${ts.getMonth()}-${ts.getDate()}`;
-    const nextTsDate = `${nextTs.getFullYear()}-${nextTs.getMonth()}-${nextTs.getDate()}`;
+  nextTimeout() {
+    const nextTime = this.nextTimeToCall();
+    let timeout = null;
 
-    return tsDate !== nextTsDate;
+    if (this.nextTs) {
+      timeout = +nextTime - +this.nextTs;
+    } else {
+      timeout = +nextTime - this.ts;
+    }
+
+    this.nextTs = nextTime;
+
+    return timeout;
   }
 
   nextTimeToCall() {
@@ -89,25 +99,28 @@ export default class CronJob {
 
     if (this.matchTime(nextTs)) return nextTs;
 
-    return this.lookupTime(nextTs);
+    const highOrderTime = this.lookupTime(nextTs);
+    const withDown = this.lookdownTime(highOrderTime);
+
+    return withDown;
   }
 
   normalizeFrom(unit, ts) {
-    const unitOptions = this[`${unit}Token`].resolvedOptions;
+    const unitOptions = this[`${unit}Token`].resolvedOptions();
     const { order: unitOrder } = unitOptions;
 
     const units = ['milliSecond', 'second', 'minute', 'hour', 'day', 'month'];
 
-    return units.reduce((prev, cur) => {
-      const options = this[`${prev}Token`].resolvedOptions;
+    return units.reduce((nextTs, unit) => {
+      const options = this.getTokenByUnit(unit).resolvedOptions();
       const { order, setCallee } = options;
-      if (order < unitOrder) nextDate[setCallee](0);
-      return nextDate;
-    }, nextDate)
+
+      if (order < unitOrder) nextTs[setCallee](0);
+      return nextTs;
+    }, this.clone(ts))
   }
 
   getTokenByUnit(unit) {
-    console.log('token : ', this[`${unit}Token`], unit);
     return this[`${unit}Token`];
   }
 
@@ -122,20 +135,18 @@ export default class CronJob {
     const nextOrder = order + 1;
     const tokens = this.getTokens();
 
-    console.log('unit : ', unit, token.resolvedOptions(), tokens, nextOrder);
+    const nextTokens = tokens.filter(token => token.resolvedOptions().order === nextOrder);
 
-    return (tokens.filter(token => token.resolvedOptions().order === nextOrder))[0].resolvedOptions().unit;
+    return nextTokens[0].resolvedOptions().unit;
   }
 
   recalcHighOrder(unit, ts) {
     const nextUnit = this.getHighOrderUnit(unit);
 
-    console.log('next and current : ', unit, nextUnit);
-
     const nextToken = this.getTokenByUnit(nextUnit);
     const { value } = nextToken.resolvedOptions();
 
-    const nextTs = ts + value;
+    const nextTs = this.normalizeFrom(nextUnit, new Date(+ts + value));
     const nextValue = this.lookup(nextUnit, nextTs);
 
     if (!nextValue) {
@@ -145,22 +156,44 @@ export default class CronJob {
     return nextValue;
   }
 
-  // to find the nearest value match on specified `unit`;
-  lookup(unit, ts) {
+  findNext(unit, ts) {
     let nextTs = ts;
     const token = this.getTokenByUnit(unit);
-    const options = token.resolvedOptions;
+    const options = token.resolvedOptions();
 
     const { value, max } = options;
+
     const timeParts = this.calcTimeParts(nextTs);
     const nextMax = typeof max === 'function' ? max(timeParts) : max;
 
-    for (let j = timeParts.day; j < nextMax; j++) {
-      nextTs = new Date(nextTs + value);
+    for (let j = timeParts[unit]; j <= nextMax; j++) {
       if (this.match(unit, nextTs)) return nextTs;
+      if (j !== nextMax) nextTs = new Date(+nextTs + value);
     }
 
-    return this.recalcHighOrder(unit, nextTs);
+    return;
+  }
+
+  // to find the nearest value match on specified `unit`;
+  lookup(unit, ts) {
+    const ret = this.findNext(unit, ts);
+    if (ret) return ret;
+    return this.recalcHighOrder(unit, ts);
+  }
+
+  lookdownTime(ts) {
+    const unit = this.reverseTravelDiff(this.nextTs || this.ts, ts);
+
+    const { order } = this.getTokenByUnit(unit).resolvedOptions();
+    const tokenOptions = this.getTokens().map(token => token.resolvedOptions());
+    const tokenOptionsWithLowerOrder = tokenOptions.filter(token => token.order <= order);
+
+    tokenOptionsWithLowerOrder.sort((a, b) => b.order - a.order);
+
+    return tokenOptionsWithLowerOrder.reduce((ts, options) => {
+      const { unit } = options;
+      return this.findNext(unit, ts);
+    }, ts)
   }
 
   // first checking hour
@@ -172,18 +205,15 @@ export default class CronJob {
 
     // to use reduce
     if (!this.match('hour', ts)) {
-      const nextHour = this.lookup('hour', ts);
-      nextTs = this.normalizeFrom('hour', nextTs);
+      return this.lookup('hour', ts);
     }
 
     if (!this.match('minute', ts)) {
-      const nextMinute = this.lookup('minute', ts);
-      nextTs = this.normalizeFrom('minute', nextTs);
+      return this.lookup('minute', ts);
     }
 
     if (!this.match('second', ts)) {
-      const nextSecond = this.lookup('second', ts);
-      nextTs = this.normalizeFrom('second', nextTs);
+      return this.lookup('second', ts);
     }
 
     return nextTs;
@@ -201,9 +231,10 @@ export default class CronJob {
     for(let i = 0; i < bases.length; i++) {
       const base = bases[i];
       const token = this[`${base}Token`];
-      const options = token.resolvedOptions;
+      const options = token.resolvedOptions();
 
       const { value, max } = options;
+
       const timeParts = this.calcTimeParts(nextTs);
       const nextMax = typeof max === 'function' ? max(timeParts) : max;
 
@@ -216,11 +247,8 @@ export default class CronJob {
 
   calcTimeParts(ts) {
     const nextTs = ts || this.ts;
-
-    console.log('ts : ', Object.prototype.toString.call(nextTs));
-
     return {
-      // millisecond: nextTs.getMilliseconds(),
+      milliSecond: nextTs.getMilliseconds(),
       second: nextTs.getSeconds(),
       minute: nextTs.getMinutes(),
       hour: nextTs.getHours(),
@@ -231,112 +259,4 @@ export default class CronJob {
       weekday: nextTs.getDay(),
     }
   }
-
-  // bestValueInRange(base, parts, opts) {
-  //   const { from, to, step, loop } = Object.assign({
-  //     step: 1,
-  //     loop: 60,
-  //   }, opts || {})
-
-  //   let nextParts = [];
-
-  //   if (parts.length === 0) {
-  //     if (!opts) return;
-
-  //     nextParts = [{ value: { from, to } }];
-  //   }
-
-  //   parts.length > 0 ? nextParts = parts : null;
-
-  //   return nextParts.reduce((prev, { value: { from, to }}) => {
-  //     for (let i = from; i < to; i = i + step) {
-  //       if (i >= base) return typeof prev !== 'undefined' ? min([prev, i]) : i;
-  //     }
-
-  //     if (prev) return prev;
-  //     return from + loop;
-  //   }, undefined)
-  // }
-
-  // bestValueInLiteral(base, parts, loop) {
-  //   parts.sort(sortByValue);
-  //   if (parts.length === 0) return;
-
-  //   const v = parts.reduce((prev, { value }) => {
-  //     return value >= base ? value : undefined;
-  //   }, undefined)
-
-  //   if (typeof v === 'undefined') return parts[0].value + loop;
-  //   return v;
-  // }
-
-  // _calNext(unit, opts) {
-  //   const base = this.calcTimeParts()[unit];
-  //   const { from, to, loop } = pick(opts, ['from', 'to', 'loop']);
-
-  //   const parts = this[`${unit}Token`].formatToParts();
-
-  //   const literalParts = parts.filter(({ type }) => type === LITERAL);
-  //   const rangeParts = parts.filter(({ type }) => type === RANGE);
-  //   const everyParts = parts.filter(({ type }) => type === EVERY).sort(sortByValue);
-
-  //   if (everyParts.length > 0) {
-  //     const { value: step } = everyParts[0];
-
-  //     const ret = this.bestValueInRange(base, rangeParts, { from, to, loop, step });
-  //     return ret;
-  //   }
-
-  //   const valueFromLiteral = this.bestValueInLiteral(base, literalParts, loop);
-  //   const valueFromRange = this.bestValueInRange(base, rangeParts);
-  //   const value = min([valueFromLiteral, valueFromRange]);
-
-  //   return value - base;
-  // }
-
-  // nextSecond() {
-  //   return this._calNext('second', {
-  //     from: 1,
-  //     to: 59,
-  //     loop: 60,
-  //   });
-  // }
-
-  // nextMinute() {
-  //   return this._calNext('minute', {
-  //     from: 1,
-  //     to: 59,
-  //     loop: 60,
-  //   });
-  // }
-
-  // nextHour() {
-  //   return this._calNext('hour', {
-  //     from: 0,
-  //     to: 23,
-  //     loop: 24,
-  //   });
-  // }
-
-  // nextMonth() {
-  //   return this._calNext('month', {
-  //     from: 0,
-  //     to: 11,
-  //     loop: 12,
-  //   });
-  // }
-
-  // nextTimeToCall() {
-  //   const second = this.nextSecond();
-  //   const minute = this.nextMinute();
-  //   const hour = this.nextHour();
-  //   const month = this.nextMonth();
-
-  //   return {
-  //     second,
-  //     minute,
-  //     hour,
-  //     month,
-  //   }
-  // }
 }

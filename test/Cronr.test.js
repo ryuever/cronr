@@ -1,27 +1,39 @@
 import Cronr from '../src/Cronr';
 
-test('heart beat', () => {
-  const job = Cronr.create('2,15-50,4-12 * * * * *', () => {
+test('matchDateOrWeekday', () => {
+  const job = Cronr.create('2,15-50,4-12 * * 1-12 * 2', () => {
+    console.log('tick');
+  })
+  const result = job.matchDateOrWeekday();
+  expect(result).toEqual(false);
+})
+
+test('matchDateOrWeekday', () => {
+  const job = Cronr.create('2,15-50,4-12 * * 1-31 * *', () => {
+    console.log('tick');
+  })
+  const result = job.matchDateOrWeekday();
+  expect(result).toEqual(true);
+})
+
+test('calculate next time to call', () => {
+  const job = Cronr.create('20 * * * * *', () => {
     console.log('tick');
   })
 
-  job.start = new Date(2018, 1, 30, 10, 11, 3);
-  const { second } = job.nextTimeToCall();
-  expect(second).toEqual(1);
+  job.ts = new Date(2018, 1, 30, 10, 11, 16);
+  const timeout = job.nextTimeout();
 
-  job.start = new Date(2018, 1, 30, 10, 11, 51);
-  const { second: second2 } = job.nextTimeToCall();
-  expect(second2).toEqual(11);
+  expect(timeout).toBe(4 * 1000);
+})
 
-  job.start = new Date(2018, 1, 30, 10, 11, 13);
-  const { second: second3 } = job.nextTimeToCall();
-  expect(second3).toEqual(2);
+test('calculate next time to call 2', () => {
+  const job = Cronr.create('20 * * * * *', () => {
+    console.log('tick');
+  })
 
-  job.start = new Date(2018, 1, 30, 10, 11, 16);
-  const { second: second4 } = job.nextTimeToCall();
-  expect(second4).toEqual(0);
+  job.ts = new Date(2018, 1, 30, 10, 11, 22);
+  const timeout = job.nextTimeout();
 
-  job.start = new Date(2018, 1, 30, 10, 11, 10);
-  const { second: second5 } = job.nextTimeToCall();
-  expect(second5).toEqual(0);
+  expect(timeout).toBe(58 * 1000);
 })

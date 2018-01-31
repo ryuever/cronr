@@ -2,6 +2,7 @@ import utils from './utils';
 const { isLeap } = utils;
 
 export const units = [
+  'milliSecond',
   'second',
   'minute',
   'hour',
@@ -10,6 +11,7 @@ export const units = [
   'weekday'
 ];
 
+let singletonMilliSecond = null;
 let singletonSecond = null;
 let singletonMinute = null;
 let singletonHour = null;
@@ -24,13 +26,14 @@ const nonLeapLadder = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 
 export default class Unit {
   constructor(opts) {
-    const { unit, value, max, min, order } = opts;
+    const { unit, value, max, min, order, setCallee } = opts;
 
     this.unit = unit;
     this.value = value;
     this.max = max;
     this.min = min;
     this.order = order;
+    this.setCallee = setCallee;
   }
 
   static instance(unit) {
@@ -62,7 +65,7 @@ export default class Unit {
         unit: 'milliSecond',
         value: 1,
         order: 1,
-        setCallee: 'setMilliSeconds',
+        setCallee: 'setMilliseconds',
         min: 0,
         max: 999,
       });
@@ -147,6 +150,8 @@ export default class Unit {
         value: 60 * unitBase,
         min: 0,
         max: 6,
+        order: undefined,
+        setCallee: () => {},
       });
     }
     return singletonWeekday;
