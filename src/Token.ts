@@ -23,12 +23,12 @@ export default class Token implements IToken {
   public resolvedOptionsCache: Unit;
   public formatToPartsCache: IParse;
 
-  constructor(token, unit) {
+  constructor(token: string, unit: unitType) {
     this.token = token;
     this.unit = unit;
   }
 
-  static create(token, unit): Token {
+  static create(token: string, unit: unitType): Token {
     return new Token(token, unit);
   }
 

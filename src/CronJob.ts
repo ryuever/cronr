@@ -1,4 +1,4 @@
-import Resolver from './Resolver';
+import Resolver, { ResolverConstructor } from './Resolver';
 import utils from './utils';
 import { callbackFn } from './Cronr';
 const { pick } = utils;
@@ -24,7 +24,7 @@ export default class CronJob {
 
   constructor(opts: CronJobConstructorProps) {
     const { fn } = opts;
-    const props = pick(opts, ['id', 'pattern']);
+    const props: ResolverConstructor = pick(opts, ['id', 'pattern']);
 
     this.fn = fn;
     this.resolver = new Resolver(props);

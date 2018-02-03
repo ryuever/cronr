@@ -18,6 +18,11 @@ export interface IDateInfo {
   weekday: number,
 };
 
+export interface ResolverConstructor {
+  id: string;
+  pattern: string;
+};
+
 // type IPattern(pattern: any)<A extends Pattern> = new (pattern: any) => A;
 
 export default class Resolver {
@@ -33,7 +38,7 @@ export default class Resolver {
   public ts: Date;
   public nextTs: Date | null;
 
-  constructor(opts: { id: string, pattern: string}) {
+  constructor(opts: ResolverConstructor) {
     const { id, pattern } = opts;
     const patternInstance: Pattern = Pattern.create(pattern);
 

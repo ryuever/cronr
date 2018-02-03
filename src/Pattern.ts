@@ -12,7 +12,7 @@ export default class Pattern {
 
   private pattern: string;
 
-  constructor(pattern) {
+  constructor(pattern: string) {
     this.milliSecondToken = Object.create(null);
     this.secondToken = Object.create(null);
     this.minuteToken = Object.create(null);

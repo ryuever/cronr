@@ -1,11 +1,11 @@
 import { LITERAL, RANGE, EVERY } from './types';
 import { unitType, assignFn } from './Unit';
 
-const isString = (str) => typeof str === 'string';
-const isDefined = (str) => typeof str !== 'undefined';
-const weekdayToNumber = str => weekdays.indexOf(str);
-const monthToNumber = str => monthes.indexOf(str)
-const toInt = int => parseInt(int);
+const isString = (str: any) => typeof str === 'string';
+const isDefined = (str: any) => typeof str !== 'undefined';
+const weekdayToNumber = (str:string):number => weekdays.indexOf(str);
+const monthToNumber = (str: string):number => monthes.indexOf(str)
+const toInt = (int: any) => parseInt(int);
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthes = [
@@ -46,7 +46,7 @@ const extractors = Object.create(null);
 
 const regToKey = (reg: RegExp): string => reg.source;
 
-extractors[regToKey(twoDigital)] = (str) => {
+extractors[regToKey(twoDigital)] = (str: string) => {
   const result = twoDigital.exec(str);
   if (result) {
     const [, value ] = result;
@@ -58,7 +58,7 @@ extractors[regToKey(twoDigital)] = (str) => {
   return null;
 };
 
-extractors[regToKey(threeDigital)] = (str) => {
+extractors[regToKey(threeDigital)] = (str: string) => {
   const result = threeDigital.exec(str);
   if (result) {
     const [, value ] = result;
@@ -70,7 +70,7 @@ extractors[regToKey(threeDigital)] = (str) => {
   return null;
 };
 
-extractors[regToKey(numberRange)] = (str) => {
+extractors[regToKey(numberRange)] = (str: string) => {
   const result = numberRange.exec(str);
   if (result) {
     const [, from, to ] = result;
@@ -85,7 +85,7 @@ extractors[regToKey(numberRange)] = (str) => {
   return null;
 };
 
-extractors[regToKey(asterisk)] = (str) => {
+extractors[regToKey(asterisk)] = (str: string) => {
   const result = asterisk.exec(str);
   if (result) {
     const [, , value] = result;
@@ -100,7 +100,7 @@ extractors[regToKey(asterisk)] = (str) => {
   }
 }
 
-extractors[regToKey(oneWithSlash)] = (str) => {
+extractors[regToKey(oneWithSlash)] = (str: string) => {
   const result = oneWithSlash.exec(str);
   if (result) {
     const [, from, value] = result;
@@ -113,7 +113,7 @@ extractors[regToKey(oneWithSlash)] = (str) => {
   }
 }
 
-extractors[regToKey(twoNumberWithSlash)] = (str) => {
+extractors[regToKey(twoNumberWithSlash)] = (str: string) => {
   const result = twoNumberWithSlash.exec(str);
   if (result) {
     const [, from, to, value] = result;
@@ -131,7 +131,7 @@ extractors[regToKey(twoNumberWithSlash)] = (str) => {
   return [];
 }
 
-extractors[regToKey(weekday)] = (str) => {
+extractors[regToKey(weekday)] = (str: string) => {
   const result = weekday.exec(str);
   if (result) {
     const [, from, to, value] = result;
@@ -149,7 +149,7 @@ extractors[regToKey(weekday)] = (str) => {
   }
 }
 
-extractors[regToKey(month)] = (str) => {
+extractors[regToKey(month)] = (str: string) => {
   const result = month.exec(str);
   if (result) {
     const [, from, to, value] = result;

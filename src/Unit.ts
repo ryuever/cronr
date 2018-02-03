@@ -119,7 +119,7 @@ export default class Unit {
         case 'day':
           props = {
             min: 0,
-            max: ({ month, year }) => isLeap(year) ? leapLadder[month] : nonLeapLadder[month],
+            max: ({ month, year }: {month: number; year: number}): number => isLeap(year) ? leapLadder[month] : nonLeapLadder[month],
             value: 24 * 3600 * unitBase,
             setCallee: 'setDate',
           };

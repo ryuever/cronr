@@ -5,7 +5,7 @@ export interface singletonProps {
   jobs: CronJobList,
 };
 
-export type callbackFn = (any) => any;
+export type callbackFn = () => any;
 
 let singleton: null | singletonProps = null;
 
