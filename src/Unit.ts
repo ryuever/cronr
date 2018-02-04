@@ -126,15 +126,16 @@ export default class Unit {
           break;
         case 'month':
           props = {
-            min: 0,
-            max: 11,
+            min: 1,
+            max: 12,
             value: undefined,
             setCallee: 'setMonth',
           };
+          break;
         case 'weekday':
           props = {
-            min: 0,
-            max: 6,
+            min: 1,
+            max: 7,
             value: undefined,
             setCallee: undefined,
           };

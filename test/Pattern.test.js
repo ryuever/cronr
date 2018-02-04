@@ -144,7 +144,7 @@ test('test month', () => {
 
   const partsFromMonth = monthToken.formatToParts();
   expect(partsFromMonth).toEqual([
-    { type: LITERAL, value: 0 },
+    { type: LITERAL, value: 1 },
   ]);
 })
 
@@ -163,8 +163,8 @@ test('test month range', () => {
   expect(partsFromMonth).toEqual([{
     type: RANGE,
     value: {
-      from: 0,
-      to: 4
+      from: 1,
+      to: 5
     }
   }]);
 })
@@ -182,7 +182,7 @@ test('test weekday', () => {
 
   const partsFromWeekday = weekdayToken.formatToParts();
   expect(partsFromWeekday).toEqual([
-    { type: LITERAL, value: 1 },
+    { type: LITERAL, value: 2 },
   ]);
 })
 
@@ -201,8 +201,152 @@ test('test weekday range', () => {
   expect(partsFromWeekday).toEqual([{
     type: RANGE,
     value: {
-      from: 0,
+      from: 1,
+      to: 6,
+    }
+  }]);
+})
+
+test('test weekday min to max', () => {
+  const pattern = Pattern.create('* * * * * Mon-Sun');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromWeekday = weekdayToken.formatToParts();
+  expect(partsFromWeekday).toEqual([{
+    type: RANGE,
+    value: {
+      from: 1,
+      to: 7,
+    }
+  }]);
+})
+
+test('test weekday min to max with number from 0-6', () => {
+  const pattern = Pattern.create('* * * * * 0-6');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromWeekday = weekdayToken.formatToParts();
+  expect(partsFromWeekday).toEqual([{
+    type: RANGE,
+    value: {
+      from: 1,
+      to: 7,
+    }
+  }]);
+})
+
+test('test weekday min to max with number from 1-7', () => {
+  const pattern = Pattern.create('* * * * * 1-7');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromWeekday = weekdayToken.formatToParts();
+  expect(partsFromWeekday).toEqual([{
+    type: RANGE,
+    value: {
+      from: 1,
+      to: 7,
+    }
+  }]);
+})
+
+test('test weekday with full name', () => {
+  const pattern = Pattern.create('* * * * * monday-sunday');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromWeekday = weekdayToken.formatToParts();
+  expect(partsFromWeekday).toEqual([{
+    type: RANGE,
+    value: {
+      from: 1,
+      to: 7,
+    }
+  }]);
+})
+
+test('test weekday mixin short name with full name', () => {
+  const pattern = Pattern.create('* * * * * monday-fri');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromWeekday = weekdayToken.formatToParts();
+  expect(partsFromWeekday).toEqual([{
+    type: RANGE,
+    value: {
+      from: 1,
       to: 5,
+    }
+  }]);
+})
+
+test('test month with full name', () => {
+  const pattern = Pattern.create('* * * * January *');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromMonth = monthToken.formatToParts();
+  expect(partsFromMonth).toEqual([{
+    type: LITERAL,
+    value: 1,
+  }]);
+})
+
+test.only('test month mixin short name with full name', () => {
+  const pattern = Pattern.create('* * * * March-December *');
+  const {
+    secondToken,
+    minuteToken,
+    hourToken,
+    dayToken,
+    monthToken,
+    weekdayToken
+  } = pattern;
+
+  const partsFromMonth = monthToken.formatToParts();
+  expect(partsFromMonth).toEqual([{
+    type: RANGE,
+    value: {
+      from: 3,
+      to: 12,
     }
   }]);
 })
