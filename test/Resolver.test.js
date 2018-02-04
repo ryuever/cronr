@@ -1,10 +1,11 @@
 import Cronr from '../src/Cronr';
 const noop = () => {};
 
-test('matchDateOrWeekday', () => {
-  const job = Cronr.create('2,15-50,4-12 * * 1-12 * 2', noop);
+test('matchDateOrWeekday on sunday', () => {
+  const job = Cronr.create('2,15-50,4-12 * * 1-12 * 0', noop);
+  job.resolver.ts = new Date(2018, 2, 4, 10, 11, 16);
   const result = job.resolver.matchDateOrWeekday();
-  expect(result).toEqual(false);
+  expect(result).toEqual(true);
 })
 
 test('matchDateOrWeekday', () => {
@@ -49,7 +50,7 @@ test('calculate next time to call 2', () => {
   expect(timeout).toBe(41 * 1000);
 })
 
-test.only('calculate next time to call 2', () => {
+test('calculate next time to call 2', () => {
   const job = Cronr.create('3,15 14 * * * *', noop);
 
   job.resolver.ts = new Date(2018, 1, 30, 10, 11, 22);

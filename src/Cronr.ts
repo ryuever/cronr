@@ -19,6 +19,7 @@ export default class Cronr {
 
   constructor() {
     this.count = 0;
+    this.jobs = Object.create(null);
   }
 
   static buildId(): string {
@@ -27,6 +28,7 @@ export default class Cronr {
 
   static create(pattern: string, fn: callbackFn): CronJob {
     if (!singleton) singleton = new Cronr();
+
     const id = Cronr.buildId();
 
     singleton.jobs[id] = new CronJob({ id, pattern, fn });

@@ -13,11 +13,25 @@
     "build": "rimraf lib && rollup -c --environment INCLUDE_DEPS,BUILD:production",
     "test": "jest"
   },
+  "jest": {
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "<rootDir>/preprocessor.js",
+      "^.+\\.jsx?$": "babel-jest"
+    },
+    "testMatch": [
+      "**/test/*.(ts|tsx|js)"
+    ]
+  },
   "author": "youchao.liu",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.0",
-    "babel-jest": "^21.2.0",
+    "babel-jest": "^22.1.0",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -31,7 +45,6 @@
     "rollup-plugin-commonjs": "^8.2.6",
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-typescript": "^0.8.1",
-    "ts-jest": "^21.2.4",
     "typescript": "^2.6.2"
   }
 }
