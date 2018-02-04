@@ -12,6 +12,8 @@ export default class Pattern {
 
   private pattern: string;
 
+  [k: string]: any;
+
   constructor(pattern: string) {
     this.milliSecondToken = Object.create(null);
     this.secondToken = Object.create(null);

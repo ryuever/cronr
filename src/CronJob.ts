@@ -17,6 +17,8 @@ export interface CronJobConstructorProps {
   pattern: string,
 }
 
+// type keyType = 'id' | 'pattern';
+
 export default class CronJob {
   public resolver: Resolver;
   public timeId: null | number;
@@ -24,7 +26,9 @@ export default class CronJob {
 
   constructor(opts: CronJobConstructorProps) {
     const { fn } = opts;
-    const props: ResolverConstructor = pick(opts, ['id', 'pattern']);
+
+    const keys: Array<'id' | 'pattern'> = ['id', 'pattern'];
+    const props: ResolverConstructor = pick(opts, keys);
 
     this.fn = fn;
     this.resolver = new Resolver(props);

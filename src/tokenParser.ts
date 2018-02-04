@@ -31,11 +31,11 @@ patterns.day = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWith
 patterns.month = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash, month]);
 patterns.weekday = combinePatterns([twoDigital, numberRange, asterisk, twoNumberWithSlash, weekday]);
 
-function combinePatterns(patterns) {
-  return (str) => {
+function combinePatterns(patterns: Array<RegExp>) {
+  return (str: string) => {
     for (let pattern of patterns) {
       const match = pattern.test(str);
-      if (match) return extractors[pattern](str);
+      if (match) return extractors[pattern.source](str);
     }
 
     throw new Error(`no match patterns`);

@@ -23,7 +23,30 @@ export interface ResolverConstructor {
   pattern: string;
 };
 
+type Index = 'milliSecondToken' | 'secondToken' | 'minuteToken' | 'hourToken' | 'dayToken' | 'monthToken';
+type indexSignature = {
+  [k in Index]?: number;
+}
+
 // type IPattern(pattern: any)<A extends Pattern> = new (pattern: any) => A;
+
+// Element implicitly has an 'any' type because type 'Resolver' has no index signature.
+
+// interface IRawParams {
+//   [key in Index]: any;
+// }
+
+// class Foo implements IRawParams {
+//   [k: string]: any;
+// }
+
+interface withCallee {
+  [k: string]: any;
+}
+
+declare class DateWithSignature extends Date {
+  [k: string]: any;
+};
 
 export default class Resolver {
   public pattern: Pattern;
@@ -37,6 +60,8 @@ export default class Resolver {
 
   public ts: Date;
   public nextTs: Date | null;
+  [k: string]: any;
+  // [key in Index]: Token;
 
   constructor(opts: ResolverConstructor) {
     const { id, pattern } = opts;
@@ -155,7 +180,7 @@ export default class Resolver {
     const { order: unitOrder } = unitOptions;
     const nextUnits = units.slice(0, -1);
 
-    return nextUnits.reduce((nextTs: Date, unit: unitType) => {
+    return nextUnits.reduce((nextTs: DateWithSignature, unit: unitType) => {
       const options = this.getTokenByUnit(unit).resolvedOptions();
       const { order, setCallee } = options;
 
