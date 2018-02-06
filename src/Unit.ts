@@ -11,6 +11,8 @@ export const units: unitTypes = [
   'weekday'
 ];
 
+// type instanceType<>
+
 export type timeType = 'milliSecond' | 'second' | 'minute' | 'hour';
 export type dateType = 'day' | 'month' | 'weekday';
 export type unitType = timeType | dateType;
@@ -74,7 +76,7 @@ export default class Unit {
     return Unit.getInstance(unit);
   }
 
-  static getInstance(unit: unitType): IUnit {
+  static getInstance(unit: unitType): Unit {
     if (!singletonInstance[unit]) {
       const defaultProps = {
         unit,
@@ -144,7 +146,7 @@ export default class Unit {
 
       singletonInstance[unit] = new Unit({
         ...props, ...defaultProps
-      })
+      } as IUnit);
     }
 
     return singletonInstance[unit];

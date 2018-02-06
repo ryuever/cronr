@@ -23,6 +23,7 @@ export default class Cronr {
   }
 
   static buildId(): string {
+    if (!singleton) singleton = new Cronr();
     return `cronr-${singleton.count++}`;
   }
 

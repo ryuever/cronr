@@ -28,7 +28,8 @@ export default class CronJob {
     const { fn } = opts;
 
     const keys: Array<'id' | 'pattern'> = ['id', 'pattern'];
-    const props: ResolverConstructor = pick(opts, keys);
+    // const props: ResolverConstructor = pick(opts, keys);
+    const props: ResolverConstructor = pick(opts, 'id', 'pattern');
 
     this.fn = fn;
     this.resolver = new Resolver(props);
@@ -54,7 +55,7 @@ export default class CronJob {
   }
 
   public stop(): void {
-    window.clearTimeout(this.timeId);
+    window.clearTimeout(this.timeId as number);
   }
 
   public resume(): void {

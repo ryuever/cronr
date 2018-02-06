@@ -115,9 +115,11 @@ export default class Resolver {
     return matchWeekday || matchDate;
   }
 
-  private clone(ts: Date): Date {
+  private clone(ts: Date | number): Date {
     if (typeof ts === 'number') return new Date(ts);
     if (ts instanceof Date) return new Date(+ts);
+
+    throw new Error('`clone` with invalid value');
   }
 
   private reverseTravelDiff(ts: Date, nextTs: Date): unitType {
@@ -129,6 +131,8 @@ export default class Resolver {
     for (let unit of orders) {
       if (tsTimeParts[unit] !== nextTsTimeParts[unit]) return unit;
     }
+
+    throw new Error('Failed to find ')
   }
 
   public next(): number {
@@ -225,7 +229,7 @@ export default class Resolver {
     return nextValue;
   }
 
-  private findNext(unit: unitType, ts: Date): Date | undefined {
+  private findNext(unit: unitType, ts: Date): Date {
     let nextTs = ts;
     const token = this.getTokenByUnit(unit);
     const options = token.resolvedOptions();
@@ -240,14 +244,17 @@ export default class Resolver {
       if (j !== nextMax) nextTs = new Date(+nextTs + value);
     }
 
-    return;
+    throw new Error('failed to find next value');
   }
 
   // to find the nearest value match on specified `unit`;
   private lookup(unit: unitType, ts: Date): Date {
-    const ret = this.findNext(unit, ts);
-    if (ret) return ret;
-    return this.recalcHighOrder(unit, ts);
+    try {
+      const ret = this.findNext(unit, ts);
+      return ret;
+    } catch(err) {
+      return this.recalcHighOrder(unit, ts);
+    }
   }
 
   private lookdownTime(ts: Date): Date {
@@ -302,6 +309,8 @@ export default class Resolver {
         if (this.matchDateOrWeekday(nextTs)) return nextTs;
       }
     }
+
+    throw new Error('failed to find high order date value');
   }
 
   calcTimeParts(ts?: Date): IDateInfo {

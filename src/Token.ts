@@ -1,6 +1,6 @@
 import { parse, IParse, ILiteral, IEvery, IRange, parseResult } from './tokenParser';
 import { unitType }from './Unit';
-import Unit from './Unit';
+import Unit, { assignFn } from './Unit';
 import { LITERAL, RANGE, EVERY } from './types';
 import { IDateInfo } from './Resolver';
 
@@ -56,7 +56,7 @@ export default class Token implements IToken {
     const { min, max } = this.resolvedOptions();
     let nextMax = max;
 
-    if (typeof max === 'function') nextMax = max(dateInfo);
+    if (typeof max === 'function' && dateInfo) nextMax = (max as assignFn)(dateInfo);
 
     // only if has type 'EVERY' will provide defualt rangeParts;
     if (rangeParts.length === 0 && everyParts.length > 0) {
