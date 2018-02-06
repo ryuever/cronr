@@ -1,14 +1,13 @@
 import { LITERAL, RANGE, EVERY } from './types';
 import Unit, { unitType, assignFn } from './Unit';
 
-const isString = (str: any) => typeof str === 'string';
-const isNumber = (obj: any) => typeof obj === 'number';
-const isDefined = (str: any) => typeof str !== 'undefined';
+const isString = (str: any): str is string => typeof str === 'string';
+const isNumber = (obj: any) : obj is number => typeof obj === 'number';
 const weekdayToNumber = (str:string):number => weekdays.indexOf(str);
 const monthToNumber = (str: string):number => monthes.indexOf(str)
 const toInt = (int: any) => parseInt(int);
 const capitalizeFirst = (str: string): string => str.charAt(0).toUpperCase() + str.toLowerCase().slice(1, 3);
-const capitalizeAndSlice = (str: string) => str.replace(/[a-zA-Z]+/g, capitalizeFirst);
+const capitalizeAndSlice = (str: string): string => str.replace(/[a-zA-Z]+/g, capitalizeFirst);
 
 const weekdays = [,'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthes = [,
@@ -187,15 +186,8 @@ type rangeValue = {
 export type ILiteral = { type: 'literal', value: numberValue };
 export type IEvery = { type: 'every', value: numberValue };
 export type IRange = { type: 'range', value: rangeValue};
-
 export type parseResult = ILiteral | IEvery | IRange;
-
 export type IParse = Array<parseResult>;
-
-type postFn = (arr: IParse) => IParse;
-
-// const conbineWithProceed = (processors: Array<postFn>): postFn =>
-//   (arr: IParse) => processors.reduce((prev, cur) => cur(prev), arr);
 
 const normalizeValue = (max: number, min: number, value: numberValue): numberValue => {
   if (value > max) return max;
@@ -215,32 +207,18 @@ const normalizeRangeValue = (max: number, min: number, value: rangeValue): range
   };
 };
 
-// declare interface ObjectConstructor {
-//   assign(target: any, ...sources: any[]): any;
-// }
-
 const runValueRangeConstraint = (unit: unitType) => {
   return (actions: IParse): IParse => {
-
     const instance: Unit = Unit.getInstance(unit);
     const { max, min } = instance;
 
     if (isNumber(max) && isNumber(min)) {
-      const nextMax: number = <number>max;
-      const nextMin: number = <number>min;
       return actions.map((action: parseResult):parseResult => {
-        const { type, value } = action;
-
-        switch(type) {
+        switch(action.type) {
           case LITERAL:
-            // return { ...action, value: normalizeValue(nextMax, min, <numberValue>value))};
-            return Object.assign({}, action, {
-              value: normalizeValue(nextMax, nextMin, <numberValue>value)
-            });
+            return { ...action, value: normalizeValue(max, min, action.value)};
           case RANGE:
-            return Object.assign({}, action, {
-              value: normalizeRangeValue(nextMax, nextMin, <rangeValue>value)
-            });
+            return { ...action, value: normalizeRangeValue(max, min, action.value)};
           case EVERY:
             return { ...action };
         }
@@ -252,26 +230,19 @@ const runValueRangeConstraint = (unit: unitType) => {
 }
 
 const normalizeWeekdayValue = (actions: IParse): IParse => {
-  const instance: Unit = Unit.getInstance('weekday');
-  const { max, min } = instance;
   return actions.map((action) => {
-    const { type, value } = action;
-    switch(type) {
+    switch(action.type) {
       case LITERAL:
-        // return { ...action, value: value === 0 ? 7 : value }
-        return Object.assign({}, action, {
-          value: value === 0 ? 7 : value,
-        })
+        const literalValue = action.value;
+        return { ...action, value: literalValue === 0 ? 7 : literalValue }
       case RANGE:
-        if ((<rangeValue>value).from === 0 && (<rangeValue>value).to === 6) {
-          // return { ...action, value: { from: 1, to: 7 }};
-          return Object.assign({}, action, {
-            value: { from: 1, to: 7 }
-          })
+        const rangeValue = action.value;
+        if (rangeValue.from === 0 && rangeValue.to === 6) {
+          return { ...action, value: { from: 1, to: 7 }};
         }
-        return action;
+        return { ...action };
       case EVERY:
-        return action;
+        return { ...action };
     }
   })
 }
@@ -282,6 +253,7 @@ postProcess.second = conbineWithProceed([runValueRangeConstraint('second')]);
 postProcess.minute = conbineWithProceed([runValueRangeConstraint('minute')]);
 postProcess.hour = conbineWithProceed([runValueRangeConstraint('hour')]);
 postProcess.month = conbineWithProceed([runValueRangeConstraint('month')]);
+
 // normalizeWeekdayValue` should run first. It should process origin value with `0-6`
 postProcess.weekday = conbineWithProceed([normalizeWeekdayValue, runValueRangeConstraint('weekday')]);
 
