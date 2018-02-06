@@ -10,13 +10,6 @@ export interface IToken {
   formatToParts(): IParse,
 };
 
-// interface Array<T> {
-//   filter((item: { type: 'literal' }): Array<ILiteral>)
-
-//   // filter((item: { type: 'literal' }): Array<ILiteral>)
-//   // filter<U extends T>(pred: (a: T) => a is U): U[];
-// }
-
 export default class Token implements IToken {
   public token: string;
   public unit: unitType;
@@ -43,10 +36,6 @@ export default class Token implements IToken {
 
   public matchToken(data: number, dateInfo?: IDateInfo): boolean {
     const parts = this.formatToParts();
-
-    // const literalParts: Array<ILiteral> = parts.filter(({ type }) => type === LITERAL);
-    // const everyParts: Array<IEvery>  = parts.filter(({ type }) => type === EVERY);
-    // let rangeParts: Array<IRange> = parts.filter(({ type }) => type === RANGE);
 
     const literalParts: Array<ILiteral> = parts.filter((part): part is ILiteral => part.type === LITERAL);
     const everyParts: Array<IEvery>  = parts.filter((part): part is IEvery => part.type === EVERY);
