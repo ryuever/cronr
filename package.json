@@ -46,5 +46,6 @@
     "rollup-plugin-node-resolve": "^3.0.0",
     "rollup-plugin-typescript": "^0.8.1",
     "typescript": "^2.6.2"
-  }
+  },
+  "repository": "https://github.com/ryuever/cronr.git"
 }
