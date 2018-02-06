@@ -11,24 +11,12 @@ export const units: unitTypes = [
   'weekday'
 ];
 
-// type instanceType<>
-
 export type timeType = 'milliSecond' | 'second' | 'minute' | 'hour';
 export type dateType = 'day' | 'month' | 'weekday';
 export type unitType = timeType | dateType;
 export type unitTypes = Array<unitType>;
 export type timeTypes = Array<timeType>;
 export type dateTypes = Array<dateType>;
-// export type unitTypes = {
-//   milliSecond: number;
-//   second: number;
-//   minute: number;
-//   hour: number;
-//   day: number;
-//   month: number;
-//   weekday: number;
-// };
-// export type unitTypes = Array<'milliSecond' | 'second' | 'minute' | 'hour' | 'day' | 'month' | 'weekday'>;
 
 const nonLeapLadder = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const leapLadder = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
@@ -76,6 +64,10 @@ export default class Unit {
     return Unit.getInstance(unit);
   }
 
+  static getDayMax({ month, year }: {month: number; year: number}): number {
+    return isLeap(year) ? leapLadder[month] : nonLeapLadder[month]
+  }
+
   static getInstance(unit: unitType): Unit {
     if (!singletonInstance[unit]) {
       const defaultProps = {
@@ -121,7 +113,7 @@ export default class Unit {
         case 'day':
           props = {
             min: 0,
-            max: ({ month, year }: {month: number; year: number}): number => isLeap(year) ? leapLadder[month] : nonLeapLadder[month],
+            max: Unit.getDayMax,
             value: 24 * 3600 * unitBase,
             setCallee: 'setDate',
           };
