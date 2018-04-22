@@ -8,6 +8,10 @@ const monthToNumber = (str: string):number => monthes.indexOf(str)
 const toInt = (int: any) => parseInt(int);
 const capitalizeFirst = (str: string): string => str.charAt(0).toUpperCase() + str.toLowerCase().slice(1, 3);
 const capitalizeAndSlice = (str: string): string => str.replace(/[a-zA-Z]+/g, capitalizeFirst);
+const minusOneIfNumber = (str: string): string => str.replace(/[0-9]+/g, (str:string): string => {
+  const number = parseInt(str);
+  return `${number - 1}`;
+});
 
 const weekdays = [,'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const monthes = [,
@@ -30,7 +34,7 @@ const conbineWithProceed = (processors: Array<Function>) =>(arr: any)=>
   processors.reduce((prev, cur) => cur(prev), arr);
 
 const preProcess = Object.create(null);
-preProcess.month = conbineWithProceed([capitalizeAndSlice])
+preProcess.month = conbineWithProceed([capitalizeAndSlice, minusOneIfNumber])
 preProcess.weekday = conbineWithProceed([capitalizeAndSlice])
 
 const twoDigital = /^(\d{1,2})$/;

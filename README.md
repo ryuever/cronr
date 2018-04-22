@@ -22,3 +22,12 @@ npm install cronr
 ```
 
 - if both "day of month" and "day of week" are restricted (not "*"), then one or both must match the current day.()
+
+## Cronr
+
+- If it is provider with a pattern and startTime time, it will return a iterable object.`croner.next()` will return the `timeout` it should be run on next trigger.
+- provide a option to support run immediately.
+
+## range
+
+[crontab(5)](https://www.freebsd.org/cgi/man.cgi?query=crontab&sektion=5&manpath=freebsd-release-ports)

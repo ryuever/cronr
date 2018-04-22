@@ -8,7 +8,7 @@ export const units: unitTypes = [
   'hour',
   'day',
   'month',
-  'weekday'
+  'weekday',
 ];
 
 export type timeType = 'milliSecond' | 'second' | 'minute' | 'hour';
@@ -34,6 +34,7 @@ export interface IUnit {
   max: number | assignFn,
   min: number,
   order: number,
+  step: number,
   setCallee: string,
 };
 
@@ -43,16 +44,22 @@ export default class Unit {
   public max: number | assignFn;
   public min: number;
   public order: number;
+  public step: number;
   public setCallee: string;
 
   constructor(opts: IUnit) {
-    const { unit, value, max, min, order, setCallee } = opts;
+    const {
+      unit, value, step,
+      max, min, order,
+      setCallee
+    } = opts;
 
     this.unit = unit;
     this.value = value;
     this.max = max;
     this.min = min;
     this.order = order;
+    this.step = step;
     this.setCallee = setCallee;
   }
 
@@ -82,6 +89,7 @@ export default class Unit {
           props = {
             min: 0,
             max: 999,
+            step: 1,
             value: 1,
             setCallee: 'setMilliseconds',
           };
@@ -90,6 +98,7 @@ export default class Unit {
           props = {
             min: 0,
             max: 59,
+            step: 1 * unitBase,
             value: 1 * unitBase,
             setCallee: 'setSeconds',
           };
@@ -98,6 +107,7 @@ export default class Unit {
           props = {
             min: 0,
             max: 59,
+            step: 60 * unitBase,
             value: 60 * unitBase,
             setCallee: 'setMinutes',
           };
@@ -106,32 +116,36 @@ export default class Unit {
           props = {
             min: 0,
             max: 23,
+            step: 60 * 60 * unitBase,
             value: 60 * 60 * unitBase,
             setCallee: 'setHours',
           };
           break;
         case 'day':
           props = {
-            min: 0,
+            min: 1,
             max: Unit.getDayMax,
+            step: 24 * 3600 * unitBase,
             value: 24 * 3600 * unitBase,
             setCallee: 'setDate',
-          };
-          break;
-        case 'month':
-          props = {
-            min: 1,
-            max: 12,
-            value: undefined,
-            setCallee: 'setMonth',
           };
           break;
         case 'weekday':
           props = {
             min: 1,
             max: 7,
+            step: 24 * 3600 * unitBase,
             value: undefined,
             setCallee: undefined,
+          };
+          break;
+        case 'month':
+          props = {
+            min: 0,
+            max: 11,
+            step: 24 * 3600 * unitBase,
+            value: undefined,
+            setCallee: 'setMonth',
           };
           break;
       }

@@ -3,42 +3,20 @@ import { LITERAL, RANGE, EVERY } from './types';
 import utils from './utils';
 import { units, unitType, timeTypes, unitTypes } from './Unit';
 import Token from './Token';
+import resolveTsParts, { IDateInfo } from './utils/resolveTsParts';
 
-const { pick, sortByValue, min } = utils;
-
-export interface IDateInfo {
-  milliSecond: number,
-  second: number,
-  minute: number,
-  hour: number,
-
-  day: number,
-  month: number,
-
-  weekday: number,
-};
+const { pick, min } = utils;
 
 export interface ResolverConstructor {
   id: string;
   pattern: string;
+  ts: Date | null;
 };
 
 type Index = 'milliSecondToken' | 'secondToken' | 'minuteToken' | 'hourToken' | 'dayToken' | 'monthToken';
 type indexSignature = {
   [k in Index]?: number;
 }
-
-// type IPattern(pattern: any)<A extends Pattern> = new (pattern: any) => A;
-
-// Element implicitly has an 'any' type because type 'Resolver' has no index signature.
-
-// interface IRawParams {
-//   [key in Index]: any;
-// }
-
-// class Foo implements IRawParams {
-//   [k: string]: any;
-// }
 
 interface withCallee {
   [k: string]: any;
@@ -47,6 +25,8 @@ interface withCallee {
 declare class DateWithSignature extends Date {
   [k: string]: any;
 };
+
+const toNum: (t: Date) => number = (date: Date): number => date.valueOf();
 
 export default class Resolver {
   public pattern: Pattern;
@@ -58,13 +38,13 @@ export default class Resolver {
   public monthToken: Token;
   public weekdayToken: Token;
 
+  public originTs: Date;
   public ts: Date;
   public nextTs: Date | null;
   [k: string]: any;
-  // [key in Index]: Token;
 
   constructor(opts: ResolverConstructor) {
-    const { id, pattern } = opts;
+    const { id, pattern, ts } = opts;
     const patternInstance: Pattern = Pattern.create(pattern);
 
     const {
@@ -87,245 +67,161 @@ export default class Resolver {
     this.monthToken = monthToken;
     this.weekdayToken = weekdayToken;
 
-    this.ts = new Date();
+    // `originTs` served as the base ts; It aims to calculate to nextTs's offset.
+    this.originTs = ts || new Date();
+    // plus one millisecond
+    this.ts = new Date(toNum(this.originTs) + 1);
     this.nextTs = null;
   }
 
-  private match(unit: unitType, ts: Date): boolean{
-    const info = this.calcTimeParts(ts);
-    const token = this.getTokenByUnit(unit);
-    return token.matchToken(info[unit]);
-  }
-
-  private matchTime(ts: Date): boolean{
-    const matchSecond = this.match('second', ts);
-    const matchMinute = this.match('minute', ts);
-    const matchHour = this.match('hour', ts);
-
-    return matchSecond && matchMinute && matchHour;
-  }
-
-  private matchDateOrWeekday(ts?: Date): boolean {
-    const info = this.calcTimeParts();
-    const { day, month, weekday } = info;
-
-    const matchWeekday = this.weekdayToken.matchToken(weekday, info);
-    const matchDate = this.dayToken.matchToken(day, info);
-
-    return matchWeekday || matchDate;
-  }
-
-  private clone(ts: Date | number): Date {
-    if (typeof ts === 'number') return new Date(ts);
-    if (ts instanceof Date) return new Date(+ts);
-
-    throw new Error('`clone` with invalid value');
-  }
-
-  private reverseTravelDiff(ts: Date, nextTs: Date): unitType {
-    const orders: unitTypes = units.slice().reverse().slice(1);
-
-    const tsTimeParts = this.calcTimeParts(ts);
-    const nextTsTimeParts = this.calcTimeParts(nextTs);
-
-    for (let unit of orders) {
-      if (tsTimeParts[unit] !== nextTsTimeParts[unit]) return unit;
+  [Symbol.iterator]() {
+    return {
+      next: () => {
+        const nextTime = this.nextTimeToCall();
+        const step = this.pattern.resolveStep();
+        this.ts = new Date(toNum(nextTime) + step);
+        return {
+          value: nextTime,
+          // value: {
+          //   offset: toNum(nextTime) - toNum(this.originTs),
+          //   nextTs: new Date(toNum(nextTime)).toString(),
+          // },
+          done: false,
+        }
+      }
     }
-
-    throw new Error('Failed to find ')
   }
 
-  public next(): number {
-    const nextTime = this.nextTimeToCall();
-    let timeout = null;
-
-    if (this.nextTs) {
-      timeout = +nextTime - +this.nextTs;
-    } else {
-      timeout = +nextTime - +this.ts;
-    }
-
-    this.nextTs = nextTime;
-    this.ts = new Date(+nextTime + this.nextTickOffset());
-
-    return timeout;
-  }
-
-  public reset(): void {
-    this.ts = this.nextTs = new Date();
-  }
-
+  /**
+   * Accroding to the time pattern and this.ts to calculate the nextTime
+   * abide to the `cron time pattern`
+   */
   public nextTimeToCall(): Date {
-    let nextTs = this.ts;
-    if (!this.matchDateOrWeekday()) {
-      const nextDate = this.lookupDate(this.clone(nextTs));
-      const unit = this.reverseTravelDiff(nextTs, nextDate);
-      nextTs = this.normalizeFrom(unit, nextDate);
+    const len = units.length;
+
+    this.traverse(units[len - 2], this.ts);
+
+    return this.ts;
+  }
+
+  private normalizeTsValueAfterUnit(
+    unit: unitType,
+    ts: DateWithSignature,
+    inclusive?: boolean
+  ) {
+
+    const index = units.indexOf(unit);
+    let max = index;
+
+    if (inclusive) {
+      max = index + 1;
     }
 
-    if (this.matchTime(nextTs)) return nextTs;
-
-    const highOrderTime = this.lookupTime(nextTs);
-
-    const diffUnit =  this.reverseTravelDiff(highOrderTime, this.nextTs || this.ts);
-    const normalizedHighOrderTime = this.normalizeFrom(diffUnit, highOrderTime);
-    const withDown = this.lookdownTime(normalizedHighOrderTime);
-
-    return withDown;
+    for(let i = 0; i < max; i++) {
+      const unit = units[i];
+      const token = this.getTokenByUnit(unit);
+      const options = token.resolvedOptions();
+      const { setCallee, min } = options;
+      ts[setCallee](min)
+    }
   }
 
-  private nextTickOffset(): number {
-    const token = this.pattern.beginningUnitTokenToRestrict().resolvedOptions();
-    return token.value;
+  private decorateTsWithClosestValidValueAfterUnit(
+    unit: unitType,
+    ts: DateWithSignature,
+    inclusive?: boolean
+  ) {
+    const index = units.indexOf(unit);
+    let max = index;
+
+    if (inclusive) {
+      max = index + 1;
+    }
+
+    for(let i = 0; i < max; i++) {
+      const unit = units[i];
+      const token = this.getTokenByUnit(unit);
+      const value = resolveTsParts(ts)[unit];
+      const newValue = token.findTheClosestValidValue(value, ts);
+      const options = token.resolvedOptions();
+      const { setCallee } = options;
+      ts[setCallee](newValue);
+    }
   }
 
-  private normalizeFrom(unit: unitType, ts: Date): Date {
-    const unitOptions = this[`${unit}Token`].resolvedOptions();
-    const { order: unitOrder } = unitOptions;
-    const nextUnits = units.slice(0, -1);
+  private traverse(unit: unitType, ts: DateWithSignature) {
+    const index = units.indexOf(unit);
+    const token = this.getTokenByUnit(unit);
+    const info = resolveTsParts(ts);
+    const value = info[unit];
 
-    return nextUnits.reduce((nextTs: DateWithSignature, unit: unitType) => {
-      const options = this.getTokenByUnit(unit).resolvedOptions();
-      const { order, setCallee } = options;
+    if (!this.checkIfTokenMatchsValue(token, value, info)) {
+      try {
+        const validValue = this.findTokenClosestValidValue(token, value, ts);
+        const { setCallee } = token.resolvedOptions();
+        ts[setCallee](validValue);
+        this.normalizeTsValueAfterUnit(unit, ts);
+        this.decorateTsWithClosestValidValueAfterUnit(unit, ts);
+        return;
+      } catch(err) {
+        if (unit !== 'month') {
+          const parentUnit = units[index + 1];
+          const parentToken = this.getTokenByUnit(parentUnit);
+          const { setCallee } = parentToken.resolvedOptions();
+          const parentValue = info[parentUnit];
+          ts[setCallee](parentValue + 1);
+          this.normalizeTsValueAfterUnit(parentUnit, ts);
+          this.traverse(parentUnit, ts);
+        } else {
+          const year = ts.getFullYear();
+          ts.setFullYear(year + 1);
+          this.normalizeTsValueAfterUnit(unit, ts, true);
+          this.decorateTsWithClosestValidValueAfterUnit(unit, ts, true);
+        }
+        return;
+      }
+    }
+    if (index > 0) {
+      this.traverse(units[index - 1], ts);
+    }
+  }
 
-      if (order < unitOrder) nextTs[setCallee](0);
-      return nextTs;
-    }, this.clone(ts))
+  private checkIfTokenMatchsValue(token: Token, value: number, info: IDateInfo) {
+    const unit = token.unit;
+    if (unit !== 'day') {
+      return token.matchToken(value, info);
+    }
+
+    const weekdayToken = this.getTokenByUnit('weekday');
+    const matchWeekday = weekdayToken.matchToken(info.weekday, info);
+    const matchDate = token.matchToken(value, info);
+
+    return matchWeekday && matchDate;
+  }
+
+  private findTokenClosestValidValue(token: Token, value: number, ts: DateWithSignature) {
+    const unit = token.unit;
+
+    if (unit !== 'day') {
+      return token.findTheClosestValidValue(value, ts);
+    }
+
+    let valueFromDayUnit = null;
+
+    try {
+      valueFromDayUnit = token.findTheClosestValidValue(value, ts);
+    } catch (err) {
+      // ...
+    }
+
+    if (valueFromDayUnit) return valueFromDayUnit;
+
+    const weekdayToken = this.getTokenByUnit('weekday');
+    const info = resolveTsParts(ts);
+    return weekdayToken.findTheClosestValidValue(info.weekday, ts);
   }
 
   private getTokenByUnit(unit: unitType): Token {
     return this[`${unit}Token`];
-  }
-
-  private getTokens(): Array<Token> {
-    return units.map(unit => this[`${unit}Token`]);
-  }
-
-  private getHighOrderUnit(unit: unitType): unitType {
-    const token: Token = this.getTokenByUnit(unit);
-    const order: number = token.resolvedOptions().order;
-
-    const nextOrder: number = order + 1;
-    const tokens: Array<Token> = this.getTokens();
-
-    const nextTokens: Array<Token> = tokens.filter(token => token.resolvedOptions().order === nextOrder);
-
-    return nextTokens[0].resolvedOptions().unit;
-  }
-
-  private recalcHighOrder(unit: unitType, ts: Date): Date {
-    const nextUnit: unitType = this.getHighOrderUnit(unit);
-
-    const nextToken: Token = this.getTokenByUnit(nextUnit);
-    const { value } = nextToken.resolvedOptions();
-
-    const nextTs: Date = this.normalizeFrom(nextUnit, new Date(+ts + value));
-    const nextValue: Date = this.lookup(nextUnit, nextTs);
-
-    if (!nextValue) {
-      return this.recalcHighOrder(nextUnit, ts);
-    }
-
-    return nextValue;
-  }
-
-  private findNext(unit: unitType, ts: Date): Date {
-    let nextTs = ts;
-    const token = this.getTokenByUnit(unit);
-    const options = token.resolvedOptions();
-
-    const { value, max } = options;
-
-    const timeParts = this.calcTimeParts(nextTs);
-    const nextMax = typeof max === 'function' ? max(timeParts) : max;
-
-    for (let j = timeParts[unit]; j <= nextMax; j++) {
-      if (this.match(unit, nextTs)) return nextTs;
-      if (j !== nextMax) nextTs = new Date(+nextTs + value);
-    }
-
-    throw new Error('failed to find next value');
-  }
-
-  // to find the nearest value match on specified `unit`;
-  private lookup(unit: unitType, ts: Date): Date {
-    try {
-      const ret = this.findNext(unit, ts);
-      return ret;
-    } catch(err) {
-      return this.recalcHighOrder(unit, ts);
-    }
-  }
-
-  private lookdownTime(ts: Date): Date {
-    const unit = this.reverseTravelDiff(this.nextTs || this.ts, ts);
-
-    const { order } = this.getTokenByUnit(unit).resolvedOptions();
-    const tokenOptions = this.getTokens().map(token => token.resolvedOptions());
-    const tokenOptionsWithLowerOrder = tokenOptions.filter(token => token.order <= order);
-
-    tokenOptionsWithLowerOrder.sort((a, b) => b.order - a.order);
-
-    return tokenOptionsWithLowerOrder.reduce((ts, options) => {
-      const { unit } = options;
-      return this.findNext(unit, ts);
-    }, ts)
-  }
-
-  // first checking hour
-  // then checking minute
-  // finally checking second
-  private lookupTime(ts: Date): Date {
-    const bases: timeTypes = ['hour', 'minute', 'second'];
-    let nextTs = ts;
-
-    for (let base of bases) {
-      if (!this.match(base, ts)) return this.lookup(base, ts);
-    }
-    return nextTs;
-  }
-
-  // only care day, month, year; then return a valid next date.
-  private lookupDate(ts: Date): Date {
-    const bases = ['day', 'month'];
-
-    if (this.matchDateOrWeekday(ts)) return ts;
-
-    let day = ts.getDate();
-    let nextTs = ts;
-
-    for(let i = 0; i < bases.length; i++) {
-      const base = bases[i];
-      const token = this[`${base}Token`];
-      const options = token.resolvedOptions();
-
-      const { value, max } = options;
-
-      const timeParts = this.calcTimeParts(nextTs);
-      const nextMax = typeof max === 'function' ? max(timeParts) : max;
-
-      for (let j = day; j < nextMax; j++) {
-        nextTs = new Date(nextTs + value);
-        if (this.matchDateOrWeekday(nextTs)) return nextTs;
-      }
-    }
-
-    throw new Error('failed to find high order date value');
-  }
-
-  calcTimeParts(ts?: Date): IDateInfo {
-    const nextTs: Date = ts || this.ts;
-
-    return {
-      milliSecond: nextTs.getMilliseconds(),
-      second: nextTs.getSeconds(),
-      minute: nextTs.getMinutes(),
-      hour: nextTs.getHours(),
-
-      day: nextTs.getDate(),
-      month: nextTs.getMonth(),
-
-      weekday: nextTs.getDay(),
-    }
   }
 }

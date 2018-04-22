@@ -32,18 +32,26 @@ export default class Pattern {
     return instance;
   }
 
-  public beginningUnitTokenToRestrict(): Token {
-    let parts: Array<string> = this.patternParts();
-    const len = parts.length;
-    const unitLen = units.length;
-
-    const index = unitLen - len;
-
-    return this[`${units[index]}Token`];
-  }
-
   private patternParts(): Array<string> {
     return this.pattern.split(' ');
+  }
+
+  /**
+   * The first one which is not `*` will determine the next timestamp's plus step.
+   */
+  public resolveStep(): number {
+    const len = this.fullPatternParts.length;
+
+    let i = 0;
+
+    for (; i < len; i++) {
+      if (this.fullPatternParts[i] !== '*') {
+        break;
+      }
+    }
+
+    const options = this[`${units[i]}Token`].resolvedOptions();
+    return options.step;
   }
 
   private initToken(): void {
@@ -54,6 +62,8 @@ export default class Pattern {
     if (len < 5 || len > 7) throw new Error('Invalid pattern');
     if (len === 5) parts = ['*', '*'].concat(parts);
     if (len === 6) parts = ['*'].concat(parts);
+
+    this.fullPatternParts = parts;
 
     parts.forEach((part, i) =>
       this[`${units[i]}Token`] = Token.create(part, units[i])

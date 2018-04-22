@@ -1,38 +1,18 @@
-import CronJob from './CronJob';
+import Resolver, { ResolverConstructor } from './Resolver';
 
-export interface singletonProps {
-  count: number,
-  jobs: CronJobList,
-};
-
-export type callbackFn = () => any;
-
-export interface CronJobList {
-  [index: string]: CronJob
-};
+export interface CronConstructorProps {
+  name: string,
+  pattern: string,
+}
 
 export default class Cronr {
-  public count: number;
-  public jobs: CronJobList;
-  public static singleton: singletonProps;
+  public name: string;
+  public resolver: Iterator<Date>;
 
-  constructor() {
-    this.count = 0;
-    this.jobs = Object.create(null);
-  }
-
-  static buildId(): string {
-    if (!Cronr.singleton) Cronr.singleton = new Cronr();
-    return `cronr-${Cronr.singleton.count++}`;
-  }
-
-  static create(pattern: string, fn: callbackFn): CronJob {
-    if (!Cronr.singleton) Cronr.singleton = new Cronr();
-
-    const id = Cronr.buildId();
-
-    Cronr.singleton.jobs[id] = new CronJob({ id, pattern, fn });
-
-    return Cronr.singleton.jobs[id];
+  constructor(opts: CronConstructorProps) {
+    const { name, ...rest } = opts;
+    this.name = name;
+    const resolver = new Resolver(<ResolverConstructor>rest);
+    this.resolver = resolver[Symbol.iterator]();
   }
 }

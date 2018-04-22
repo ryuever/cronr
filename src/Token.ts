@@ -2,7 +2,7 @@ import { parse, IParse, ILiteral, IEvery, IRange, parseResult } from './tokenPar
 import { unitType }from './Unit';
 import Unit, { assignFn } from './Unit';
 import { LITERAL, RANGE, EVERY } from './types';
-import { IDateInfo } from './Resolver';
+import resolveTsParts, { IDateInfo } from './utils/resolveTsParts';
 
 export interface IToken {
   resolvedOptions(): Unit,
@@ -76,6 +76,31 @@ export default class Token implements IToken {
     }
 
     return false;
+  }
+
+  /**
+   * value should be included
+   * Because the `max` value of `month` should be determined by `year` and `month`;
+   * there is a need of `ts` param;
+   */
+  public findTheClosestValidValue(value: number, ts: Date) {
+    const { max, min } = this.resolvedOptions();
+    const info = resolveTsParts(ts);
+
+    let nextMax = max;
+    if (typeof nextMax === 'function') {
+      const year = ts.getFullYear();
+      const month = ts.getMonth();
+      nextMax = nextMax(info);
+    }
+
+    for (let i = value; i >= min && i <= nextMax; i++) {
+      if (this.matchToken(i, info)) {
+        return i;
+      }
+    }
+
+    throw new Error('Maybe you should carry over the number, then match again');
   }
 
   public formatToParts(): IParse {

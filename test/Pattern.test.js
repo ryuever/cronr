@@ -26,7 +26,7 @@ test('works with specified second pattern', () => {
         to: 7,
     }}
   ]);
-})
+});
 
 test('works with specified second and minute mixed pattern', () => {
   const pattern = Pattern.create('2,4-9,3-7 2-8,3-9 0 0 0 0');
@@ -67,7 +67,7 @@ test('works with specified second and minute mixed pattern', () => {
       to: 9,
     }}
   ]);
-})
+});
 
 test('with asterisk', () => {
   const pattern = Pattern.create('* * * * * *');
@@ -106,7 +106,7 @@ test('with asterisk and slash', () => {
   expect(partsFromSecond).toEqual([
     { type: EVERY, value: 3 },
   ]);
-})
+});
 
 test('number range and slash', () => {
   const pattern = Pattern.create('7-8/3 * * * * *');
@@ -129,7 +129,7 @@ test('number range and slash', () => {
       }
     }
   ]);
-})
+});
 
 test('test month', () => {
   const pattern = Pattern.create('* * * * Jan *');
@@ -146,7 +146,7 @@ test('test month', () => {
   expect(partsFromMonth).toEqual([
     { type: LITERAL, value: 1 },
   ]);
-})
+});
 
 test('test month range', () => {
   const pattern = Pattern.create('* * * * Jan-May *');
@@ -167,7 +167,7 @@ test('test month range', () => {
       to: 5
     }
   }]);
-})
+});
 
 test('test weekday', () => {
   const pattern = Pattern.create('* * * * * Tue');
@@ -184,7 +184,7 @@ test('test weekday', () => {
   expect(partsFromWeekday).toEqual([
     { type: LITERAL, value: 2 },
   ]);
-})
+});
 
 test('test weekday range', () => {
   const pattern = Pattern.create('* * * * * Mon-Sat');
@@ -205,7 +205,7 @@ test('test weekday range', () => {
       to: 6,
     }
   }]);
-})
+});
 
 test('test weekday min to max', () => {
   const pattern = Pattern.create('* * * * * Mon-Sun');
@@ -226,7 +226,7 @@ test('test weekday min to max', () => {
       to: 7,
     }
   }]);
-})
+});
 
 test('test weekday min to max with number from 0-6', () => {
   const pattern = Pattern.create('* * * * * 0-6');
@@ -247,7 +247,7 @@ test('test weekday min to max with number from 0-6', () => {
       to: 7,
     }
   }]);
-})
+});
 
 test('test weekday min to max with number from 1-7', () => {
   const pattern = Pattern.create('* * * * * 1-7');
@@ -268,7 +268,7 @@ test('test weekday min to max with number from 1-7', () => {
       to: 7,
     }
   }]);
-})
+});
 
 test('test weekday with full name', () => {
   const pattern = Pattern.create('* * * * * monday-sunday');
@@ -289,7 +289,7 @@ test('test weekday with full name', () => {
       to: 7,
     }
   }]);
-})
+});
 
 test('test weekday mixin short name with full name', () => {
   const pattern = Pattern.create('* * * * * monday-fri');
@@ -310,7 +310,7 @@ test('test weekday mixin short name with full name', () => {
       to: 5,
     }
   }]);
-})
+});
 
 test('test month with full name', () => {
   const pattern = Pattern.create('* * * * January *');
@@ -328,9 +328,9 @@ test('test month with full name', () => {
     type: LITERAL,
     value: 1,
   }]);
-})
+});
 
-test.only('test month mixin short name with full name', () => {
+test('test month mixin short name with full name', () => {
   const pattern = Pattern.create('* * * * March-December *');
   const {
     secondToken,
@@ -346,7 +346,7 @@ test.only('test month mixin short name with full name', () => {
     type: RANGE,
     value: {
       from: 3,
-      to: 12,
+      to: 11,
     }
   }]);
-})
+});
