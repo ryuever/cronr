@@ -7,8 +7,6 @@ export interface singletonProps {
 
 export type callbackFn = () => any;
 
-let singleton: null | singletonProps = null;
-
 export interface CronJobList {
   [index: string]: CronJob
 };
@@ -16,6 +14,7 @@ export interface CronJobList {
 export default class Cronr {
   public count: number;
   public jobs: CronJobList;
+  public static singleton: singletonProps;
 
   constructor() {
     this.count = 0;
@@ -23,17 +22,17 @@ export default class Cronr {
   }
 
   static buildId(): string {
-    if (!singleton) singleton = new Cronr();
-    return `cronr-${singleton.count++}`;
+    if (!Cronr.singleton) Cronr.singleton = new Cronr();
+    return `cronr-${Cronr.singleton.count++}`;
   }
 
   static create(pattern: string, fn: callbackFn): CronJob {
-    if (!singleton) singleton = new Cronr();
+    if (!Cronr.singleton) Cronr.singleton = new Cronr();
 
     const id = Cronr.buildId();
 
-    singleton.jobs[id] = new CronJob({ id, pattern, fn });
+    Cronr.singleton.jobs[id] = new CronJob({ id, pattern, fn });
 
-    return singleton.jobs[id];
+    return Cronr.singleton.jobs[id];
   }
 }
