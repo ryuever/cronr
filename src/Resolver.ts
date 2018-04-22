@@ -1,9 +1,9 @@
-import Pattern from './Pattern';
-import { LITERAL, RANGE, EVERY } from './types';
-import utils from './utils';
-import { units, unitType, timeTypes, unitTypes } from './Unit';
-import Token from './Token';
-import resolveTsParts, { IDateInfo } from './utils/resolveTsParts';
+import Pattern from "./Pattern";
+import { LITERAL, RANGE, EVERY } from "./types";
+import utils from "./utils";
+import { units, unitType, timeTypes, unitTypes } from "./Unit";
+import Token from "./Token";
+import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
 
 const { pick, min } = utils;
 
@@ -11,12 +11,16 @@ export interface ResolverConstructor {
   id: string;
   pattern: string;
   ts: Date | null;
-};
-
-type Index = 'milliSecondToken' | 'secondToken' | 'minuteToken' | 'hourToken' | 'dayToken' | 'monthToken';
-type indexSignature = {
-  [k in Index]?: number;
 }
+
+type Index =
+  | "milliSecondToken"
+  | "secondToken"
+  | "minuteToken"
+  | "hourToken"
+  | "dayToken"
+  | "monthToken";
+type indexSignature = { [k in Index]?: number };
 
 interface withCallee {
   [k: string]: any;
@@ -24,7 +28,7 @@ interface withCallee {
 
 declare class DateWithSignature extends Date {
   [k: string]: any;
-};
+}
 
 const toNum: (t: Date) => number = (date: Date): number => date.valueOf();
 
@@ -74,7 +78,7 @@ export default class Resolver {
     this.nextTs = null;
   }
 
-  [Symbol.iterator]() {
+  public [Symbol.iterator]() {
     return {
       next: () => {
         const nextTime = this.nextTimeToCall();
@@ -86,10 +90,10 @@ export default class Resolver {
           //   offset: toNum(nextTime) - toNum(this.originTs),
           //   nextTs: new Date(toNum(nextTime)).toString(),
           // },
-          done: false,
-        }
+          done: false
+        };
       }
-    }
+    };
   }
 
   /**
@@ -98,9 +102,7 @@ export default class Resolver {
    */
   public nextTimeToCall(): Date {
     const len = units.length;
-
     this.traverse(units[len - 2], this.ts);
-
     return this.ts;
   }
 
@@ -109,7 +111,6 @@ export default class Resolver {
     ts: DateWithSignature,
     inclusive?: boolean
   ) {
-
     const index = units.indexOf(unit);
     let max = index;
 
@@ -117,12 +118,12 @@ export default class Resolver {
       max = index + 1;
     }
 
-    for(let i = 0; i < max; i++) {
+    for (let i = 0; i < max; i++) {
       const unit = units[i];
       const token = this.getTokenByUnit(unit);
       const options = token.resolvedOptions();
       const { setCallee, min } = options;
-      ts[setCallee](min)
+      ts[setCallee](min);
     }
   }
 
@@ -138,7 +139,7 @@ export default class Resolver {
       max = index + 1;
     }
 
-    for(let i = 0; i < max; i++) {
+    for (let i = 0; i < max; i++) {
       const unit = units[i];
       const token = this.getTokenByUnit(unit);
       const value = resolveTsParts(ts)[unit];
@@ -163,8 +164,8 @@ export default class Resolver {
         this.normalizeTsValueAfterUnit(unit, ts);
         this.decorateTsWithClosestValidValueAfterUnit(unit, ts);
         return;
-      } catch(err) {
-        if (unit !== 'month') {
+      } catch (err) {
+        if (unit !== "month") {
           const parentUnit = units[index + 1];
           const parentToken = this.getTokenByUnit(parentUnit);
           const { setCallee } = parentToken.resolvedOptions();
@@ -186,23 +187,31 @@ export default class Resolver {
     }
   }
 
-  private checkIfTokenMatchsValue(token: Token, value: number, info: IDateInfo) {
+  private checkIfTokenMatchsValue(
+    token: Token,
+    value: number,
+    info: IDateInfo
+  ) {
     const unit = token.unit;
-    if (unit !== 'day') {
+    if (unit !== "day") {
       return token.matchToken(value, info);
     }
 
-    const weekdayToken = this.getTokenByUnit('weekday');
+    const weekdayToken = this.getTokenByUnit("weekday");
     const matchWeekday = weekdayToken.matchToken(info.weekday, info);
     const matchDate = token.matchToken(value, info);
 
     return matchWeekday && matchDate;
   }
 
-  private findTokenClosestValidValue(token: Token, value: number, ts: DateWithSignature) {
+  private findTokenClosestValidValue(
+    token: Token,
+    value: number,
+    ts: DateWithSignature
+  ) {
     const unit = token.unit;
 
-    if (unit !== 'day') {
+    if (unit !== "day") {
       return token.findTheClosestValidValue(value, ts);
     }
 
@@ -216,7 +225,7 @@ export default class Resolver {
 
     if (valueFromDayUnit) return valueFromDayUnit;
 
-    const weekdayToken = this.getTokenByUnit('weekday');
+    const weekdayToken = this.getTokenByUnit("weekday");
     const info = resolveTsParts(ts);
     return weekdayToken.findTheClosestValidValue(info.weekday, ts);
   }
