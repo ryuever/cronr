@@ -83,13 +83,10 @@ export default class Resolver {
       next: () => {
         const nextTime = this.nextTimeToCall();
         const step = this.pattern.resolveStep();
+
         this.ts = new Date(toNum(nextTime) + step);
         return {
           value: nextTime,
-          // value: {
-          //   offset: toNum(nextTime) - toNum(this.originTs),
-          //   nextTs: new Date(toNum(nextTime)).toString(),
-          // },
           done: false
         };
       }
@@ -198,7 +195,7 @@ export default class Resolver {
     }
 
     const weekdayToken = this.getTokenByUnit("weekday");
-    const matchWeekday = weekdayToken.matchToken(info.weekday, info);
+    const matchWeekday = weekdayToken.matchToken(info.weekday + 1, info);
     const matchDate = token.matchToken(value, info);
 
     return matchWeekday && matchDate;

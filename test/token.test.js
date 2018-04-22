@@ -7,16 +7,8 @@ test('test formatToParts', () => {
 
   expect(parts).toEqual([
     { type: LITERAL, value: 2 },
-    { type: RANGE,
-      value: {
-        from: 4,
-        to: 9,
-    }},
-    { type: RANGE,
-      value: {
-        from: 3,
-        to: 7,
-    }}
+    { type: RANGE, value: { from: 4, to: 9 } },
+    { type: RANGE, value: { from: 3, to: 7 } },
   ]);
 });
 
