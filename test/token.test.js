@@ -1,5 +1,5 @@
 import Token from '../src/Token';
-import { LITERAL, RANGE, EVERY } from '../src/types';
+import { LITERAL, RANGE, EVERY } from '../src/tokenTypes';
 
 test('test formatToParts', () => {
   const secondToken = Token.create('2,4-9,3-7', 'second');

@@ -1,5 +1,5 @@
 import Pattern from '../src/Pattern';
-import { LITERAL, RANGE, EVERY } from '../src/types';
+import { LITERAL, RANGE, EVERY } from '../src/tokenTypes';
 
 test('works with specified second pattern', () => {
   const pattern = Pattern.create('2,4-9,3-7 0 0 0 0 0');
