@@ -1,7 +1,5 @@
 node_modules
-lib
 *.log
 dist
-.storybook
 .README.md
 coverage

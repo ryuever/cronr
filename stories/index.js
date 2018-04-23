@@ -1,16 +1,17 @@
 import React from 'react';
 import { storiesOf } from '@storybook/react';
-import { action } from '@storybook/addon-actions';
+import Template from './components/Template';
 
-storiesOf('Button', module)
-  .add('with text', () => {
-    console.log('hehl');
-    return <button onClick={action('clicked')}>Hello button</button>;
+storiesOf('Basic usage', module)
+  .add('Trigger on 10 milliseconds', () => {
+    return <Template pattern="*/10 * * * * * *" />;
   })
-  .add('with some emoji', () => (
-    <button onClick={action('clicked')}>
-      <span role="img" aria-label="so cool">
-        😀 😎 👍 💯
-      </span>
-    </button>
-  ));
+  .add('Trigger on every second', () => {
+    return <Template pattern="*/1 * * * * *" />;
+  })
+  .add('Trigger on 2,5 second', () => {
+    return <Template pattern="2,5 * * * * *" />;
+  })
+  .add('Trigger on 7,8,9,10 second', () => {
+    return <Template pattern="7-10 * * * * *" />;
+  });

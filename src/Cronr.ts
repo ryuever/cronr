@@ -25,6 +25,7 @@ export default class Cronr {
   private timeoutId: number;
   private endTime?: Date;
   private status: IStatus;
+  public nextTick: Date;
 
   constructor(
     pattern: string,
@@ -86,12 +87,15 @@ export default class Cronr {
       timeout = toNum(nextTick) - toNum(now);
     }
 
+    this.nextTick = nextTick;
+
     const callback = () => {
       this.cb.call(this);
       const nextTick = this.iterator.next().value;
 
       if (!this.endTime || this.endTime > nextTick) {
         const timeout = toNum(nextTick) - toNum(new Date());
+        this.nextTick = nextTick;
         this.timeoutId = setTimeout(callback, timeout);
       }
     };

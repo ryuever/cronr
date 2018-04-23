@@ -1,0 +1,26 @@
+.action-groups button {
+  padding: 12px 8px;
+  font-size: 12px;
+  line-height: 16px;
+  border-radius: 5px;
+  margin-right: 10px;
+  width: 80px;
+};
+
+.action-groups button:hover {
+  cursor: pointer;
+  background: #597ef7;
+}
+
+.action-groups button:focus {
+  outline: none;
+}
+
+button.active {
+  background: #85a5ff;
+}
+
+.count-value {
+  padding: 12px 5px;
+  font-size: 16px;
+}
