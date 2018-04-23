@@ -74,7 +74,8 @@ export default class Resolver {
     // `originTs` served as the base ts; It aims to calculate to nextTs's offset.
     this.originTs = ts || new Date();
     // plus one millisecond
-    this.ts = new Date(toNum(this.originTs) + 1);
+    // this.ts = new Date(toNum(this.originTs) + 1);
+    this.ts = new Date(toNum(this.originTs));
     this.nextTs = null;
   }
 
