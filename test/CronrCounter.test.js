@@ -319,3 +319,14 @@ test('Get match `day` value from next month', () => {
   const result3 = data.next().value;
   expect(format(result3)).toBe('5/2/2018, 7:15:00 PM');
 });
+
+test('Under some condition; update `ts`, it should has different `nextValue`', () => {
+  const counter = new CronrCounter({
+    name: 'testing',
+    pattern: '*/5 15 15-20/2 2 * 5',
+    ts: new Date(2018, 3, 29, 10, 23, 36),
+  });
+  const data = counter.result;
+  const result = data.next().value;
+  expect(format(result)).toBe('5/2/2018, 3:15:00 PM');
+});

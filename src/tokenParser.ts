@@ -1,4 +1,4 @@
-import { LITERAL, RANGE, EVERY } from "./types";
+import { LITERAL, RANGE, EVERY } from "./tokenTypes";
 import Unit, { unitType, assignFn } from "./Unit";
 
 const isString = (str: any): str is string => typeof str === "string";

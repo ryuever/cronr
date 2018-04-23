@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for src/Resolver.ts</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">All files</a> / <a href="index.html">src</a> Resolver.ts
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">98.36% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>120/122</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">94.44% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>51/54</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>10/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">98.36% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>120/122</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-yes">54x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">72x</span>
+<span class="cline-any cline-yes">228x</span>
+<span class="cline-any cline-yes">228x</span>
+<span class="cline-any cline-yes">228x</span>
+<span class="cline-any cline-yes">228x</span>
+<span class="cline-any cline-yes">228x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43x</span>
+<span class="cline-any cline-yes">132x</span>
+<span class="cline-any cline-yes">132x</span>
+<span class="cline-any cline-yes">132x</span>
+<span class="cline-any cline-yes">132x</span>
+<span class="cline-any cline-yes">131x</span>
+<span class="cline-any cline-yes">131x</span>
+<span class="cline-any cline-yes">131x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">69x</span>
+<span class="cline-any cline-yes">69x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-yes">28x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">190x</span>
+<span class="cline-any cline-yes">177x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">259x</span>
+<span class="cline-any cline-yes">203x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">56x</span>
+<span class="cline-any cline-yes">21x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">35x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">25x</span>
+<span class="cline-any cline-yes">9x</span>
+<span class="cline-any cline-yes">16x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">69x</span>
+<span class="cline-any cline-yes">69x</span>
+<span class="cline-any cline-yes">57x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">8x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">715x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Pattern from "./Pattern";
+import { LITERAL, RANGE, EVERY } from "./types";
+import utils from "./utils";
+import { units, unitType, timeTypes, unitTypes } from "./Unit";
+import Token from "./Token";
+import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
+&nbsp;
+const { pick, min, toNum } = utils;
+&nbsp;
+export interface ResolverConstructor {
+  pattern: string;
+  ts: Date | null;
+}
+&nbsp;
+type Index =
+  | "milliSecondToken"
+  | "secondToken"
+  | "minuteToken"
+  | "hourToken"
+  | "dayToken"
+  | "monthToken";
+type indexSignature = { [k in <span class="branch-1 cbranch-no" title="branch not covered" >Index]?: nu</span>mber };
+&nbsp;
+interface withCallee {
+  [k: string]: any;
+}
+&nbsp;
+declare class DateWithSignature extends Date {
+  [k: string]: any;
+}
+&nbsp;
+export default class Resolver {
+  public pattern: Pattern;
+  public milliSecondToken: Token;
+  public secondToken: Token;
+  public minuteToken: Token;
+  public hourToken: Token;
+  public dayToken: Token;
+  public monthToken: Token;
+  public weekdayToken: Token;
+&nbsp;
+  public originTs: Date;
+  public ts: Date;
+  public nextTs: Date | null;
+  [k: string]: any;
+&nbsp;
+  constructor(opts: ResolverConstructor) {
+    const { pattern, ts } = opts;
+    const patternInstance: Pattern = Pattern.create(pattern);
+&nbsp;
+    const {
+      milliSecondToken,
+      secondToken,
+      minuteToken,
+      hourToken,
+      dayToken,
+      monthToken,
+      weekdayToken
+    } = patternInstance;
+&nbsp;
+    this.pattern = patternInstance;
+&nbsp;
+    this.milliSecondToken = milliSecondToken;
+    this.secondToken = secondToken;
+    this.minuteToken = minuteToken;
+    this.hourToken = hourToken;
+    this.dayToken = dayToken;
+    this.monthToken = monthToken;
+    this.weekdayToken = weekdayToken;
+&nbsp;
+    // `originTs` served as the base ts; It aims to calculate to nextTs's offset.
+    this.originTs = ts || new Date();
+    // plus one millisecond
+    // this.ts = new Date(toNum(this.originTs) + 1);
+    this.ts = new Date(toNum(this.originTs));
+    this.nextTs = null;
+  }
+&nbsp;
+  public [Symbol.iterator]() {
+    return {
+      next: () =&gt; {
+        const nextTime = this.nextTimeToCall();
+        const step = this.pattern.resolveStep();
+&nbsp;
+        this.ts = new Date(toNum(nextTime) + step);
+        return {
+          value: nextTime,
+          done: false
+        };
+      }
+    };
+  }
+&nbsp;
+  /**
+   * Accroding to the time pattern and this.ts to calculate the nextTime
+   * abide to the `cron time pattern`
+   */
+  public nextTimeToCall(): Date {
+    const len = units.length;
+    this.traverse(units[len - 2], this.ts);
+    return this.ts;
+  }
+&nbsp;
+  private normalizeTsValueAfterUnit(
+    unit: unitType,
+    ts: DateWithSignature,
+    inclusive?: boolean
+  ) {
+    const index = units.indexOf(unit);
+    let max = index;
+&nbsp;
+    if (inclusive) {
+      max = index + 1;
+    }
+&nbsp;
+    for (let i = 0; i &lt; max; i++) {
+      const unit = units[i];
+      const token = this.getTokenByUnit(unit);
+      const options = token.resolvedOptions();
+      const { setCallee, min } = options;
+      ts[setCallee](min);
+    }
+  }
+&nbsp;
+  private decorateTsWithClosestValidValueAfterUnit(
+    unit: unitType,
+    ts: DateWithSignature,
+    inclusive?: boolean
+  ) {
+    const index = units.indexOf(unit);
+    let max = index;
+&nbsp;
+    if (inclusive) {
+      max = index + 1;
+    }
+&nbsp;
+    for (let i = 0; i &lt; max; i++) {
+      const unit = units[i];
+      const token = this.getTokenByUnit(unit);
+      const value = resolveTsParts(ts)[unit];
+      const newValue = token.findTheClosestValidValue(value, ts);
+      const options = token.resolvedOptions();
+      const { setCallee } = options;
+      ts<span class="missing-if-branch" title="if path not taken" >I</span>[setCallee](newValue);
+    }<span class="cstat-no" title="statement not covered" ></span>
+  }
+&nbsp;
+  private traverse(unit: unitType, ts: DateWithSignature) {
+    const index = units.indexOf(unit);
+    const token = this.getTokenByUnit(unit);
+    const info = resolveTsParts(ts);
+    const value = info[unit];
+&nbsp;
+    if (!this.checkIfTokenMatchsValue(token, value, info)) {
+      try {
+        const validValue = this.findTokenClosestValidValue(token, value, ts);
+        const { setCallee } = token.resolvedOptions();
+        ts[setCallee](validValue);
+        this.normalizeTsValueAfterUnit(unit, ts);
+        this.decorateTsWithClosestValidValueAfterUnit(unit, ts);
+        return;
+      } catch (err) {
+        if (<span class="missing-if-branch" title="if path not taken" >I</span>unit !== "month") {
+          const <span class="cstat-no" title="statement not covered" >parentUnit </span>= units[index + 1];
+          const parentToken = this.getTokenByUnit(parentUnit);
+          const { setCallee } = parentToken.resolvedOptions();
+          const parentValue = info[parentUnit];
+          ts[setCallee](parentValue + 1);
+          this.normalizeTsValueAfterUnit(parentUnit, ts);
+          this.traverse(parentUnit, ts);
+        } else {
+          const year = ts.getFullYear();
+          ts.setFullYear(year + 1);
+          this.normalizeTsValueAfterUnit(unit, ts, true);
+          this.decorateTsWithClosestValidValueAfterUnit(unit, ts, true);
+        }
+        return;
+      }
+    }
+    if (index &gt; 0) {
+      this.traverse(units[index - 1], ts);
+    }
+  }
+&nbsp;
+  private checkIfTokenMatchsValue(
+    token: Token,
+    value: number,
+    info: IDateInfo
+  ) {
+    const unit = token.unit;
+    if (unit !== "day") {
+      return token.matchToken(value, info);
+    }
+&nbsp;
+    const weekdayToken = this.getTokenByUnit("weekday");
+    const dayPattern = token.pattern;
+    const weekdayPattern = weekdayToken.pattern;
+&nbsp;
+    if (weekdayPattern === "*" &amp;&amp; dayPattern === "*") return true;
+&nbsp;
+    const dayMatch = token.matchToken(value, info);
+    const weekdayMatch = weekdayToken.matchToken(info.weekday, info);
+    if (weekdayPattern === "*" &amp;&amp; dayPattern !== "*") return dayMatch;
+    if (weekdayPattern !== "*" &amp;&amp; dayPattern === "*") return weekdayMatch;
+    return dayMatch || weekdayMatch;
+  }
+&nbsp;
+  private findTokenClosestValidValue(
+    token: Token,
+    value: number,
+    ts: DateWithSignature
+  ) {
+    const unit = token.unit;
+&nbsp;
+    if (unit !== "day") {
+      return token.findTheClosestValidValue(value, ts);
+    }
+&nbsp;
+    const info = resolveTsParts(ts);
+&nbsp;
+    const weekdayToken = this.getTokenByUnit("weekday");
+    const dayPattern = token.pattern;
+    const weekdayPattern = weekdayToken.pattern;
+    if (weekdayPattern === "*" &amp;&amp; dayPattern === "*") return value;
+&nbsp;
+    const dayMatch = token.matchToken(value, info);
+    const weekdayMatch = weekdayToken.matchToken(info.weekday, info);
+&nbsp;
+    let valueFromDayUnit = null;
+    let valueFromWeekdayUnit = null;
+&nbsp;
+    try {
+      valueFromDayUnit = token.findTheClosestValidValue(value, ts);
+    } catch (err) {
+      if (weekdayPattern === "*" &amp;&amp; dayPattern !== "*") throw err;
+    }
+&nbsp;
+    if (weekdayPattern === "*" &amp;&amp; dayPattern !== "*") return valueFromDayUnit;
+&nbsp;
+    try {
+      valueFromWeekdayUnit = weekdayToken.findTheClosestValidValueForWeekday(
+        value,
+        ts
+      );
+    } catch (err) {
+      if (weekdayPattern !== "*" &amp;&amp; dayPattern === "*") throw err;
+    }
+&nbsp;
+    if (weekdayPattern !== "*" &amp;&amp; dayPattern === "*")
+      return valueFromWeekdayUnit;
+&nbsp;
+    if (valueFromDayUnit &amp;&amp; valueFromWeekdayUnit) {
+      return Math.min(valueFromDayUnit, valueFromWeekdayUnit);
+    }
+&nbsp;
+    throw new Error("Carry over to fetch again");
+  }
+&nbsp;
+  private getTokenByUnit(unit: unitType): Token {
+    return this[`${unit}Token`];
+  }
+}
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Mon Apr 23 2018 14:21:49 GMT+0800 (CST)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

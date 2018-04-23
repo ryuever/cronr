@@ -31,3 +31,14 @@ npm install cronr
 ## range
 
 [crontab(5)](https://www.freebsd.org/cgi/man.cgi?query=crontab&sektion=5&manpath=freebsd-release-ports)
+
+## Online tools to simulate cron pattern
+
+[Free Online Cron Expression Generator and Describer - FreeFormatter.com](https://www.freeformatter.com/cron-expression-generator-quartz.html)
+
+[Describes Cron expressions as human readable text](https://cronexpressiondescriptor.azurewebsites.net/)
+
+## How to write cron pattern
+
+[Cron - Wikipedia](https://en.wikipedia.org/wiki/Cron#cite_note-freebsd-4)
+[crontab(5)](https://www.freebsd.org/cgi/man.cgi?query=crontab&sektion=5&manpath=freebsd-release-ports)

@@ -1,3 +1,8 @@
+import { unitType } from "./Unit";
+import Unit, { assignFn } from "./Unit";
+import { LITERAL, RANGE, EVERY } from "./tokenTypes";
+import utils from "./utils";
+import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
 import {
   parse,
   IParse,
@@ -6,12 +11,8 @@ import {
   IRange,
   parseResult
 } from "./tokenParser";
-import { unitType } from "./Unit";
-import Unit, { assignFn } from "./Unit";
-import { LITERAL, RANGE, EVERY } from "./types";
-import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
 
-const toNum: (t: Date) => number = (date: Date): number => date.valueOf();
+const { toNum } = utils;
 
 export interface IToken {
   resolvedOptions(): Unit;

@@ -1,14 +1,12 @@
 import Pattern from "./Pattern";
-import { LITERAL, RANGE, EVERY } from "./types";
 import utils from "./utils";
 import { units, unitType, timeTypes, unitTypes } from "./Unit";
 import Token from "./Token";
 import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
 
-const { pick, min } = utils;
+const { pick, min, toNum } = utils;
 
 export interface ResolverConstructor {
-  id: string;
   pattern: string;
   ts: Date | null;
 }
@@ -30,8 +28,6 @@ declare class DateWithSignature extends Date {
   [k: string]: any;
 }
 
-const toNum: (t: Date) => number = (date: Date): number => date.valueOf();
-
 export default class Resolver {
   public pattern: Pattern;
   public milliSecondToken: Token;
@@ -43,12 +39,13 @@ export default class Resolver {
   public weekdayToken: Token;
 
   public originTs: Date;
+  public prevTs: Date;
   public ts: Date;
   public nextTs: Date | null;
   [k: string]: any;
 
   constructor(opts: ResolverConstructor) {
-    const { id, pattern, ts } = opts;
+    const { pattern, ts } = opts;
     const patternInstance: Pattern = Pattern.create(pattern);
 
     const {
@@ -82,6 +79,7 @@ export default class Resolver {
   public [Symbol.iterator]() {
     return {
       next: () => {
+        this.prevTs = new Date(toNum(this.ts));
         const nextTime = this.nextTimeToCall();
         const step = this.pattern.resolveStep();
 
