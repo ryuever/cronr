@@ -5,16 +5,16 @@ import typescript from 'rollup-plugin-typescript';
 import pkg from './package.json';
 
 export default {
-  input: 'index.js',
+  input: './src/index.ts',
   output: [
-		{
-			format: 'es',
-			file: pkg.module
-		},
-		{
-			format: 'cjs',
-			file: pkg.main
-		}
+    {
+      format: 'es',
+      file: pkg.module,
+    },
+    {
+      format: 'cjs',
+      file: pkg.main,
+    },
   ],
   plugins: [
     typescript(),
@@ -24,13 +24,16 @@ export default {
     }),
     babel({
       babelrc: false,
-      "presets": [
-        ["env", {
-          "modules": false
-        }]
+      presets: [
+        [
+          'env',
+          {
+            modules: false,
+          },
+        ],
       ],
-      "plugins": ["external-helpers", "transform-object-rest-spread"],
-      exclude: 'node_modules/**'
-    })
-  ]
+      plugins: ['external-helpers', 'transform-object-rest-spread'],
+      exclude: 'node_modules/**',
+    }),
+  ],
 };

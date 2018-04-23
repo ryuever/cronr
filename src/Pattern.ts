@@ -1,5 +1,9 @@
-import Token from './Token';
-import { units } from './Unit';
+import Token from "./Token";
+import { units } from "./Unit";
+
+const MILLISECOND_BASED = Symbol("millisecond_base");
+const SECOND_BASED = Symbol("second_based");
+const MINUTE_BASED = Symbol("minute_base");
 
 export default class Pattern {
   public milliSecondToken: Token;
@@ -24,6 +28,7 @@ export default class Pattern {
     this.weekdayToken = Object.create(null);
 
     this.pattern = pattern;
+    this.type = MILLISECOND_BASED;
   }
 
   static create(pattern: string): Pattern {
@@ -32,18 +37,39 @@ export default class Pattern {
     return instance;
   }
 
-  public beginningUnitTokenToRestrict(): Token {
-    let parts: Array<string> = this.patternParts();
-    const len = parts.length;
-    const unitLen = units.length;
-
-    const index = unitLen - len;
-
-    return this[`${units[index]}Token`];
+  private patternParts(): Array<string> {
+    return this.pattern.split(" ");
   }
 
-  private patternParts(): Array<string> {
-    return this.pattern.split(' ');
+  /**
+   * The first one which is not `*` will determine the next timestamp's plus step.
+   */
+  public resolveStep(): number {
+    const len = this.fullPatternParts.length;
+
+    let i = 0;
+
+    for (; i < len; i++) {
+      if (this.fullPatternParts[i] !== "*") {
+        break;
+      }
+    }
+
+    if (i !== len) {
+      const options = this[`${units[i]}Token`].resolvedOptions();
+      return options.step;
+    }
+
+    switch (this.type) {
+      case MILLISECOND_BASED:
+        return 1;
+      case SECOND_BASED:
+        return 1 * 1000;
+      case MINUTE_BASED:
+        return 1 * 60 * 1000;
+      default:
+        return 1;
+    }
   }
 
   private initToken(): void {
@@ -51,12 +77,20 @@ export default class Pattern {
 
     const len = parts.length;
 
-    if (len < 5 || len > 7) throw new Error('Invalid pattern');
-    if (len === 5) parts = ['*', '*'].concat(parts);
-    if (len === 6) parts = ['*'].concat(parts);
+    if (len < 5 || len > 7) throw new Error("Invalid pattern");
+    if (len === 5) {
+      parts = ["*", "*"].concat(parts);
+      this.type = MINUTE_BASED;
+    }
+    if (len === 6) {
+      parts = ["*"].concat(parts);
+      this.type = SECOND_BASED;
+    }
 
-    parts.forEach((part, i) =>
-      this[`${units[i]}Token`] = Token.create(part, units[i])
-    )
+    this.fullPatternParts = parts;
+
+    parts.forEach(
+      (part, i) => (this[`${units[i]}Token`] = Token.create(part, units[i]))
+    );
   }
 }

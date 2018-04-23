@@ -1,61 +1,69 @@
-import Cronr from '../src/Cronr';
-const noop = () => {};
+import CronrCounter from '../src/CronrCounter';
+import noop from './utils/noop';
+import format from './utils/format';
 
-test('matchDateOrWeekday on sunday', () => {
-  const job = Cronr.create('2,15-50,4-12 * * 1-12 * 0', noop);
-  job.resolver.ts = new Date(2018, 2, 4, 10, 11, 16);
-  const result = job.resolver.matchDateOrWeekday();
-  expect(result).toEqual(true);
-})
+test('normalizeTsValueAfterUnit, all the item after specified unit will be set to a valid min value', () => {
+  const ts = new Date(2018, 7, 22, 10, 23, 16);
 
-test('matchDateOrWeekday', () => {
-  const job = Cronr.create('2,15-50,4-12 * * 1-31 * *', noop);
-  const result = job.resolver.matchDateOrWeekday();
-  expect(result).toEqual(true);
-})
+  const counter = new CronrCounter({
+    name: 'normalizeTsValueAfterUnit',
+    pattern: '2,15-50 * * 3-12 3 *',
+    ts,
+  });
 
-test('full wildcard', () => {
-  const job = Cronr.create('* * * * * *', noop);
+  counter.resolver.normalizeTsValueAfterUnit('day', ts);
+  expect(format(ts)).toBe('8/22/2018, 12:00:00 AM');
+});
 
-  job.resolver.ts = new Date(2018, 1, 30, 10, 11, 16);
-  const timeout = job.resolver.next();
+test('normalizeTsValueAfterUnit for day, min value will be 1', () => {
+  const ts = new Date(2018, 7, 22, 10, 23, 16);
 
-  expect(timeout).toBe(0);
-})
+  const counter = new CronrCounter({
+    name: 'normalizeTsValueAfterUnit',
+    pattern: '2,15-50 * * 3-12 3 *',
+    ts,
+  });
 
-test('calculate next time to call', () => {
-  const job = Cronr.create('20 * * * * *', noop);
+  counter.resolver.normalizeTsValueAfterUnit('month', ts);
+  expect(format(ts)).toBe('8/1/2018, 12:00:00 AM');
+});
 
-  job.resolver.ts = new Date(2018, 1, 30, 10, 11, 16);
-  const timeout = job.resolver.next();
+test('normalizeTsValueAfterUnit with truthy `inclusive`', () => {
+  const ts = new Date(2018, 7, 22, 10, 23, 16);
 
-  expect(timeout).toBe(4 * 1000);
-})
+  const counter = new CronrCounter({
+    name: 'normalizeTsValueAfterUnit',
+    pattern: '2,15-50 * * 3-12 3 *',
+    ts,
+  });
 
-test('calculate next time to call 2', () => {
-  const job = Cronr.create('20 * * * * *', noop);
+  counter.resolver.normalizeTsValueAfterUnit('month', ts, true);
+  expect(format(ts)).toBe('1/1/2018, 12:00:00 AM');
+});
 
-  job.resolver.ts = new Date(2018, 1, 30, 10, 11, 22);
-  const timeout = job.resolver.next();
+test('decorateTsWithClosestValidValueAfterUnit', () => {
+  const ts = new Date(2018, 7, 22, 10, 23, 13);
 
-  expect(timeout).toBe(58 * 1000);
-})
+  const counter = new CronrCounter({
+    name: 'normalizeTsValueAfterUnit',
+    pattern: '2,15-50 * * 3-12 3 *',
+    ts,
+  });
 
-test('calculate next time to call 2', () => {
-  const job = Cronr.create('3,15 * * * * *', noop);
+  counter.resolver.decorateTsWithClosestValidValueAfterUnit('day', ts);
+  expect(format(ts)).toBe('8/22/2018, 10:23:15 AM');
+});
 
-  job.resolver.ts = new Date(2018, 1, 30, 10, 11, 22);
-  const timeout = job.resolver.next();
+test('decorateTsWithClosestValidValueAfterUnit', () => {
+  expect(() => {
+    const ts = new Date(2018, 7, 22, 10, 23, 13);
 
-  expect(timeout).toBe(41 * 1000);
-})
+    const counter = new CronrCounter({
+      name: 'normalizeTsValueAfterUnit',
+      pattern: '2,15-50 * * 3-12 3 *',
+      ts,
+    });
 
-test('calculate next time to call 2', () => {
-  const job = Cronr.create('3,15 14 * * * *', noop);
-
-  job.resolver.ts = new Date(2018, 1, 30, 10, 11, 22);
-  const timeout = job.resolver.next();
-
-  expect(timeout).toBe(161 * 1000);
-})
-
+    counter.resolver.decorateTsWithClosestValidValueAfterUnit('day', ts, true);
+  }).toThrow();
+});
