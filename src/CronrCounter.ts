@@ -3,6 +3,7 @@ import Resolver, { ResolverConstructor } from "./Resolver";
 export interface CronrCounterConstructorProps {
   name: string;
   pattern: string;
+  ts?: Date;
 }
 
 export default class CronrCounter {
@@ -11,9 +12,12 @@ export default class CronrCounter {
   public result: Iterator<Date>;
 
   constructor(opts: CronrCounterConstructorProps) {
-    const { name, ...rest } = opts;
+    const { name, pattern, ts } = opts;
     this.name = name;
-    this.resolver = new Resolver(<ResolverConstructor>rest);
+    this.resolver = new Resolver(<ResolverConstructor>{
+      pattern,
+      ts
+    });
     this.result = this.resolver[Symbol.iterator]();
   }
 }

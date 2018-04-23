@@ -161,10 +161,12 @@ export default class Unit {
           break;
       }
 
-      singletonInstance[unit] = new Unit({
-        ...props,
-        ...defaultProps
-      } as IUnit);
+      singletonInstance[unit] = new Unit(Object.assign(
+        {},
+        props,
+        defaultProps
+      ) as IUnit);
+      // } as IUnit);
     }
 
     return singletonInstance[unit];

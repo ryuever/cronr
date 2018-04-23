@@ -4,11 +4,11 @@ import { units, unitType, timeTypes, unitTypes } from "./Unit";
 import Token from "./Token";
 import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
 
-const { pick, min, toNum } = utils;
+const { min, toNum } = utils;
 
 export interface ResolverConstructor {
   pattern: string;
-  ts: Date | null;
+  ts?: Date;
 }
 
 type Index =
@@ -41,7 +41,7 @@ export default class Resolver {
   public originTs: Date;
   public prevTs: Date;
   public ts: Date;
-  public nextTs: Date | null;
+  public nextTs?: Date;
   [k: string]: any;
 
   constructor(opts: ResolverConstructor) {

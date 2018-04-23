@@ -1,7 +1,7 @@
 import Resolver, { ResolverConstructor } from "./Resolver";
 import CronrCounter from "./CronrCounter";
 import utils from "./utils";
-const { pick, toNum } = utils;
+const { toNum } = utils;
 
 type fn = () => {};
 const INITIAL = "initial";
@@ -80,9 +80,6 @@ export default class Cronr {
 
     let timeout = toNum(nextTick) - toNum(now);
 
-    console.log("now : ", now.toLocaleString("en-US"));
-    console.log("timeout : ", nextTick.toLocaleString("en-US"), timeout);
-
     // To avoid dulplicate running;
     if (timeout === 0 && this.immediate) {
       nextTick = this.iterator.next().value;
@@ -100,12 +97,15 @@ export default class Cronr {
     };
 
     this.timeoutId = setTimeout(callback, timeout);
+    this.status = RUNNING;
   }
 
   private msg(status: IStatus): string {
     return (
-      `Current staus is ${status}, ` +
-      `you can only do ${this.resolveNextValidAction(status)}`
+      `Current status is '${status}', ` +
+      `you can only do ${JSON.stringify(
+        this.resolveNextValidAction(status)
+      )} action`
     );
   }
 
@@ -114,7 +114,9 @@ export default class Cronr {
     if (this.status !== RUNNING) {
       throw new Error(this.msg(this.status));
     }
+
     clearTimeout(this.timeoutId);
+
     this.status = SUSPEND;
   }
 
