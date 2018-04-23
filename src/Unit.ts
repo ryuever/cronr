@@ -38,6 +38,7 @@ export interface IUnit {
   order: number;
   step: number;
   setCallee: string;
+  affiliatedMax?: assignFn;
 }
 
 export default class Unit {
@@ -48,9 +49,19 @@ export default class Unit {
   public order: number;
   public step: number;
   public setCallee: string;
+  public affiliatedMax?: assignFn;
 
   constructor(opts: IUnit) {
-    const { unit, value, step, max, min, order, setCallee } = opts;
+    const {
+      unit,
+      value,
+      step,
+      max,
+      min,
+      order,
+      setCallee,
+      affiliatedMax
+    } = opts;
 
     this.unit = unit;
     this.value = value;
@@ -59,6 +70,7 @@ export default class Unit {
     this.order = order;
     this.step = step;
     this.setCallee = setCallee;
+    this.affiliatedMax = affiliatedMax;
   }
 
   static instance(unit: unitType): Unit {
@@ -132,6 +144,7 @@ export default class Unit {
           props = {
             min: 1,
             max: 7,
+            affiliatedMax: Unit.getDayMax,
             step: 24 * 3600 * unitBase,
             value: undefined,
             setCallee: "setDate"

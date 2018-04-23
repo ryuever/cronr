@@ -1,28 +1,37 @@
-import { parse, IParse, ILiteral, IEvery, IRange, parseResult } from './tokenParser';
-import { unitType }from './Unit';
-import Unit, { assignFn } from './Unit';
-import { LITERAL, RANGE, EVERY } from './types';
-import resolveTsParts, { IDateInfo } from './utils/resolveTsParts';
+import {
+  parse,
+  IParse,
+  ILiteral,
+  IEvery,
+  IRange,
+  parseResult
+} from "./tokenParser";
+import { unitType } from "./Unit";
+import Unit, { assignFn } from "./Unit";
+import { LITERAL, RANGE, EVERY } from "./types";
+import resolveTsParts, { IDateInfo } from "./utils/resolveTsParts";
+
+const toNum: (t: Date) => number = (date: Date): number => date.valueOf();
 
 export interface IToken {
-  resolvedOptions(): Unit,
-  matchToken(data: number, dateInfo?: IDateInfo) : boolean;
-  formatToParts(): IParse,
-};
+  resolvedOptions(): Unit;
+  matchToken(data: number, dateInfo?: IDateInfo): boolean;
+  formatToParts(): IParse;
+}
 
 export default class Token implements IToken {
-  public token: string;
+  public pattern: string;
   public unit: unitType;
   public resolvedOptionsCache: Unit;
   public formatToPartsCache: IParse;
 
-  constructor(token: string, unit: unitType) {
-    this.token = token;
+  constructor(pattern: string, unit: unitType) {
+    this.pattern = pattern;
     this.unit = unit;
   }
 
-  static create(token: string, unit: unitType): Token {
-    return new Token(token, unit);
+  static create(pattern: string, unit: unitType): Token {
+    return new Token(pattern, unit);
   }
 
   public resolvedOptions(): Unit {
@@ -37,9 +46,15 @@ export default class Token implements IToken {
   public matchToken(data: number, dateInfo?: IDateInfo): boolean {
     const parts = this.formatToParts();
 
-    const literalParts: Array<ILiteral> = parts.filter((part): part is ILiteral => part.type === LITERAL);
-    const everyParts: Array<IEvery>  = parts.filter((part): part is IEvery => part.type === EVERY);
-    let rangeParts: Array<IRange> = parts.filter((part): part is IRange => part.type === RANGE);
+    const literalParts: Array<ILiteral> = parts.filter(
+      (part): part is ILiteral => part.type === LITERAL
+    );
+    const everyParts: Array<IEvery> = parts.filter(
+      (part): part is IEvery => part.type === EVERY
+    );
+    let rangeParts: Array<IRange> = parts.filter(
+      (part): part is IRange => part.type === RANGE
+    );
 
     for (let i of literalParts) {
       const { value } = i;
@@ -56,14 +71,17 @@ export default class Token implements IToken {
     const { min, max } = this.resolvedOptions();
     let nextMax = max;
 
-    if (typeof max === 'function' && dateInfo) nextMax = (max as assignFn)(dateInfo);
+    if (typeof max === "function" && dateInfo)
+      nextMax = (max as assignFn)(dateInfo);
 
     // only if has type 'EVERY' will provide defualt rangeParts;
     if (rangeParts.length === 0 && everyParts.length > 0) {
-      rangeParts = [{
-        type: RANGE,
-        value: { from: min, to: nextMax }
-      }];
+      rangeParts = [
+        {
+          type: RANGE,
+          value: { from: min, to: nextMax }
+        }
+      ];
     }
 
     for (let i of rangeParts) {
@@ -88,7 +106,7 @@ export default class Token implements IToken {
     const info = resolveTsParts(ts);
 
     let nextMax = max;
-    if (typeof nextMax === 'function') {
+    if (typeof nextMax === "function") {
       const year = ts.getFullYear();
       const month = ts.getMonth();
       nextMax = nextMax(info);
@@ -100,11 +118,36 @@ export default class Token implements IToken {
       }
     }
 
-    throw new Error('Maybe you should carry over the number, then match again');
+    throw new Error("Maybe you should carry over the number, then match again");
+  }
+
+  public findTheClosestValidValueForWeekday(value: number, ts: Date) {
+    const { affiliatedMax, min } = this.resolvedOptions();
+    const info = resolveTsParts(ts);
+    const clone = new Date(toNum(ts));
+
+    if (!affiliatedMax) return;
+
+    const year = ts.getFullYear();
+    const month = ts.getMonth();
+    const nextMax = affiliatedMax(info);
+
+    for (let i = value; i >= min && i <= nextMax; ) {
+      const { weekday } = resolveTsParts(clone);
+      if (this.matchToken(weekday, info)) {
+        return i;
+      }
+
+      i++;
+      clone.setDate(i);
+    }
+
+    throw new Error("Maybe you should carry over the number, then match again");
   }
 
   public formatToParts(): IParse {
-    if (!this.formatToPartsCache) this.formatToPartsCache = parse(this.token, this.unit);
+    if (!this.formatToPartsCache)
+      this.formatToPartsCache = parse(this.pattern, this.unit);
     return this.formatToPartsCache;
   }
 }

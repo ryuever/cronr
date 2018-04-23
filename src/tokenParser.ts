@@ -16,6 +16,7 @@ const minusOneIfNumber = (str: string): string =>
     return `${number - 1}`;
   });
 
+// weekday is count from 1, 7 means sunday.
 const weekdays = [, "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const monthes = [
   "Jan",
@@ -337,8 +338,8 @@ postProcess.weekday = conbineWithProceed([
   runValueRangeConstraint("weekday")
 ]);
 
-export function parse(string: string, unit: unitType): IParse {
-  const arr = string.split(",");
+export function parse(pattern: string, unit: unitType): IParse {
+  const arr = pattern.split(",");
 
   return arr.reduce((mergedValue, cur) => {
     const pattern = patterns[unit];

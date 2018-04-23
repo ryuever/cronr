@@ -196,10 +196,16 @@ export default class Resolver {
     }
 
     const weekdayToken = this.getTokenByUnit("weekday");
-    const matchWeekday = weekdayToken.matchToken(info.weekday + 1, info);
-    const matchDate = token.matchToken(value, info);
+    const dayPattern = token.pattern;
+    const weekdayPattern = weekdayToken.pattern;
 
-    return matchWeekday && matchDate;
+    if (weekdayPattern === "*" && dayPattern === "*") return true;
+
+    const dayMatch = token.matchToken(value, info);
+    const weekdayMatch = weekdayToken.matchToken(info.weekday, info);
+    if (weekdayPattern === "*" && dayPattern !== "*") return dayMatch;
+    if (weekdayPattern !== "*" && dayPattern === "*") return weekdayMatch;
+    return dayMatch || weekdayMatch;
   }
 
   private findTokenClosestValidValue(
@@ -213,19 +219,44 @@ export default class Resolver {
       return token.findTheClosestValidValue(value, ts);
     }
 
+    const info = resolveTsParts(ts);
+
+    const weekdayToken = this.getTokenByUnit("weekday");
+    const dayPattern = token.pattern;
+    const weekdayPattern = weekdayToken.pattern;
+    if (weekdayPattern === "*" && dayPattern === "*") return value;
+
+    const dayMatch = token.matchToken(value, info);
+    const weekdayMatch = weekdayToken.matchToken(info.weekday, info);
+
     let valueFromDayUnit = null;
+    let valueFromWeekdayUnit = null;
 
     try {
       valueFromDayUnit = token.findTheClosestValidValue(value, ts);
     } catch (err) {
-      // ...
+      if (weekdayPattern === "*" && dayPattern !== "*") throw err;
     }
 
-    if (valueFromDayUnit) return valueFromDayUnit;
+    if (weekdayPattern === "*" && dayPattern !== "*") return valueFromDayUnit;
 
-    const weekdayToken = this.getTokenByUnit("weekday");
-    const info = resolveTsParts(ts);
-    return weekdayToken.findTheClosestValidValue(info.weekday, ts);
+    try {
+      valueFromWeekdayUnit = weekdayToken.findTheClosestValidValueForWeekday(
+        value,
+        ts
+      );
+    } catch (err) {
+      if (weekdayPattern !== "*" && dayPattern === "*") throw err;
+    }
+
+    if (weekdayPattern !== "*" && dayPattern === "*")
+      return valueFromWeekdayUnit;
+
+    if (valueFromDayUnit && valueFromWeekdayUnit) {
+      return Math.min(valueFromDayUnit, valueFromWeekdayUnit);
+    }
+
+    throw new Error("Carry over to fetch again");
   }
 
   private getTokenByUnit(unit: unitType): Token {
