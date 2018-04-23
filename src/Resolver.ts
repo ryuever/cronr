@@ -73,7 +73,7 @@ export default class Resolver {
     // plus one millisecond
     // this.ts = new Date(toNum(this.originTs) + 1);
     this.ts = new Date(toNum(this.originTs));
-    this.nextTs = null;
+    this.nextTs = undefined;
   }
 
   public [Symbol.iterator]() {
@@ -227,8 +227,8 @@ export default class Resolver {
     const dayMatch = token.matchToken(value, info);
     const weekdayMatch = weekdayToken.matchToken(info.weekday, info);
 
-    let valueFromDayUnit = null;
-    let valueFromWeekdayUnit = null;
+    let valueFromDayUnit = undefined;
+    let valueFromWeekdayUnit = undefined;
 
     try {
       valueFromDayUnit = token.findTheClosestValidValue(value, ts);

@@ -92,7 +92,7 @@ export default class Unit {
         order: units.indexOf(unit) + 1
       };
 
-      let props = null;
+      let props: any = undefined;
 
       switch (unit) {
         case "milliSecond":

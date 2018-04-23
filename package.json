@@ -2,16 +2,14 @@
   "name": "cronr",
   "version": "1.0.0",
   "description": "Time-based job scheduler",
-  "main": "lib/cronr.cjs.js",
-  "module": "lib/cronr.es.js",
+  "main": "lib/Cronr.cjs.js",
   "files": [
     "lib",
-    "src",
-    "index.js"
+    "src"
   ],
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
-    "build": "rimraf lib && rollup -c --environment INCLUDE_DEPS,BUILD:production",
+    "build": "rimraf lib && webpack --config scripts/webpack.config.js",
     "test": "jest"
   },
   "jest": {
@@ -32,6 +30,7 @@
   "license": "MIT",
   "devDependencies": {
     "@storybook/react": "^3.4.2",
+    "add-module-exports-webpack-plugin": "^0.1.0",
     "babel-core": "^6.26.0",
     "babel-jest": "^22.1.0",
     "babel-plugin-external-helpers": "^6.22.0",
@@ -42,17 +41,14 @@
     "husky": "^0.15.0-rc.13",
     "jest": "^21.2.1",
     "lint-staged": "^7.0.4",
+    "parallel-webpack": "^2.3.0",
     "prettier": "^1.11.1",
     "react": "^16.3.2",
     "react-dom": "^16.3.2",
     "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2",
-    "rollup": "^0.52.1",
-    "rollup-plugin-babel": "^3.0.2",
-    "rollup-plugin-commonjs": "^8.2.6",
-    "rollup-plugin-node-resolve": "^3.0.0",
-    "rollup-plugin-typescript": "^0.8.1",
-    "typescript": "^2.6.2"
+    "typescript": "^2.8.3",
+    "webpack-cli": "^2.0.15"
   },
   "husky": {
     "hooks": {
@@ -72,5 +68,9 @@
       "git rm --cached"
     ]
   },
-  "repository": "https://github.com/ryuever/cronr.git"
+  "repository": "https://github.com/ryuever/cronr.git",
+  "dependencies": {
+    "ts-loader": "^4.2.0",
+    "webpack": "^4.6.0"
+  }
 }

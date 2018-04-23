@@ -5,7 +5,11 @@
       "module": "commonjs",
       "target": "es6",
       "jsx": "react",
-      "strictNullChecks": true
+      "strictNullChecks": true,
+      "lib": [
+        "es6",
+        "dom"
+    ]
   },
   "include": [
       "./src/**/*"
