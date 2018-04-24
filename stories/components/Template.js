@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Cronr from '../../lib/Cronr.cjs.js';
+import Cronr from '../..';
 import './style.css';
 
 const format = date => date.toLocaleString('en-US');

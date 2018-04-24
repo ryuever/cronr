@@ -6,7 +6,8 @@
   "files": [
     "lib",
     "src",
-    "CronrCounter"
+    "CronrCounter.js",
+    "index.js"
   ],
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
