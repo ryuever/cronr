@@ -2,15 +2,16 @@
   "name": "cronr",
   "version": "1.0.0",
   "description": "Time-based job scheduler",
-  "main": "lib/Cronr.cjs.js",
+  "main": "lib/normal/Cronr.cjs.js",
   "files": [
     "lib",
-    "src"
+    "src",
+    "CronrCounter"
   ],
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
     "storybook-export": "build-storybook -c .storybook -o docs",
-    "build": "rimraf lib && webpack --config scripts/webpack.config.js",
+    "build": "rimraf lib && webpack --config scripts/webpack.config.js --display-chunks --display-error-details --hide-modules",
     "test": "jest"
   },
   "jest": {
@@ -67,9 +68,30 @@
       "git add"
     ]
   },
-  "repository": "https://github.com/ryuever/cronr.git",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ryuever/cronr.git"
+  },
   "dependencies": {
     "ts-loader": "^4.2.0",
     "webpack": "^4.6.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/ryuever/cronr/issues"
+  },
+  "homepage": "https://github.com/ryuever/cronr#readme",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "keywords": [
+    "cron",
+    "crontab",
+    "millisecond",
+    "job-scheduler",
+    "client",
+    "browser",
+    "npm"
+  ]
 }

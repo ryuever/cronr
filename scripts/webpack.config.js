@@ -4,13 +4,19 @@ const path = require('path');
 
 const variants = {
   minified: [true, false],
+  lib: ['Cronr', 'CronrCounter'],
   target: ['commonjs2', 'umd'],
 };
 
-const createConfig = options => {
-  const { target, minified } = options;
+const entries = {
+  'Cronr': './src/index.ts',
+  'CronrCounter': './src/CronrCounter.ts',
+};
 
-  const library = 'Cronr';
+const createConfig = options => {
+  const { target, minified, lib } = options;
+
+  const library = lib;
   let filename = library;
 
   if (target === 'commonjs2') {
@@ -26,10 +32,10 @@ const createConfig = options => {
   filename = `${filename}.js`;
 
   return {
-    entry: './src/index.ts',
+    entry: entries[library],
     mode: options.minified ? 'production' : 'development',
     output: {
-      path: path.resolve(process.cwd(), 'lib'),
+      path: path.resolve(process.cwd(), 'lib', minified ? 'minified' : 'normal'),
       filename,
       library,
       libraryTarget: options.target,
