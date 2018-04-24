@@ -80,13 +80,43 @@ const job = new Cronr(pattern, cb, {
 job.start();
 ```
 
-## Todo
+## CronrCounter
 
-### Nonstandard predefined scheduling definitions
+It mainly consists of :
 
-To support `preset` macro pattern, such as `@yearly` which means run once a year at midnight of 1 Jan.
+- Parsing `cron` macro pattern
+- A `Iterator` property which to provide the `nextTick` value.
 
-## cron syntax
+### - CronrCounter(opts: obj)
+
+opts has the following avaible properties.
+
+| Property | Description | Type | Required| Default |
+| -------- | ----------- | ---- | --- | --- |
+| name | Module name | string | false | undefined |
+| pattern | `cron` macro pattern | string | true | -- |
+| ts   | Time Starting point, which means all the `nextTick` is calculated based on this value | Date | false | `new Date()`|
+
+### - Basic Usage
+
+```js
+import CronrCounter from 'cronr/CronrCounter';
+const counter = new CronrCounter({
+  name: 'testing',
+  pattern: '2,5 * * 3-12 3 *',
+  ts: new Date(2018, 7, 22, 10, 23, 16),
+});
+
+const data = counter.result;
+const result = data.next().value;  // '3/3/2019, 12:00:02 AM'
+const result2 = data.next().value; // '3/3/2019, 12:00:05 AM'
+```
+
+## Cronr Macro Pattern
+
+It mainly inspired from [Cron - Wikipedia](https://en.wikipedia.org/wiki/Cron). Comparing with original format, it follows the basic `syntax`; For example, Every pattern is seperated by space; It still support special meaning characters(`-`, `,` and `*` etc);
+
+However, it has addtional enhancement. Recently, it support time format till milliseconds. Just as follows showing.
 
 ```bash
 *   *   *   *   *   *   *
@@ -101,24 +131,49 @@ To support `preset` macro pattern, such as `@yearly` which means run once a year
 |_________________________________  milliSecond (0 - 999, optional)
 ```
 
-- if both "day of month" and "day of week" are restricted (not "*"), then one or both must match the current day.()
+### How to write an valid macro pattern
 
-## Cronr
+You must provide a string which combines with at least `5` valid macro token(`*` or `1,2,4-5` will be considered as a token); It means if the token length is less than `7`, it will has an auto-completion on the heading position.
 
-- If it is provider with a pattern and startTime time, it will return a iterable object.`croner.next()` will return the `timeout` it should be run on next trigger.
-- provide a option to support run immediately.
+```js
+const patten = '* * 5 * * * *'   // retain the same
+const pattern = '5 * * * *';     // => '* * 5 * * * *'
+const pattern2 = '5 * * * * *';  // => '* 5 * * * * *'
+```
 
-## range
+### Simple macro samples
 
-[crontab(5)](https://www.freebsd.org/cgi/man.cgi?query=crontab&sektion=5&manpath=freebsd-release-ports)
+- _Pay attention to the token length_
 
-## Online tools to simulate cron pattern
+```js
+'* * * * * * *'       // running on every millisecond
 
-[Free Online Cron Expression Generator and Describer - FreeFormatter.com](https://www.freeformatter.com/cron-expression-generator-quartz.html)
+'*/10 * * * * *'      // running on every 10 seconds
 
-[Describes Cron expressions as human readable text](https://cronexpressiondescriptor.azurewebsites.net/)
+'30 4 1,15 * 5'       // run at 4:30 am on the 1st and 15th of each month, plus every Friday
 
-## How to write cron pattern
+'15 14 1 * *'         // run at 2:15pm on the first of every month
+
+'5 4 * * sun'         // run at 5 after 4 every sunday
+```
+
+> if both "day of month" and "day of week" are restricted (not "*"), then one or both must match the current day.
+
+## Todo
+
+### Nonstandard predefined scheduling definitions
+
+To support `preset` macro pattern, such as `@yearly` which means run once a year at midnight of 1 Jan.
+
+## Futher Reading for Cron Macro
+
+### Online tools to simulate cron pattern
+
+- [Free Online Cron Expression Generator and Describer - FreeFormatter.com](https://www.freeformatter.com/cron-expression-generator-quartz.html)
+
+- [Describes Cron expressions as human readable text](https://cronexpressiondescriptor.azurewebsites.net/)
+
+### Wikis
 
 - [Cron - Wikipedia](https://en.wikipedia.org/wiki/Cron)
 - [crontab(5)](https://www.freebsd.org/cgi/man.cgi?query=crontab&sektion=5&manpath=freebsd-release-ports)

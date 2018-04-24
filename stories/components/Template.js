@@ -24,6 +24,14 @@ export default class Template extends Component {
     this.state.status = this.job.status;
   }
 
+  componentWillUnmount() {
+    try {
+      this.job.clear();
+    } catch (err) {
+      ///
+    }
+  }
+
   handleStart() {
     try {
       this.job.start();
