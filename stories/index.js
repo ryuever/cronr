@@ -2,7 +2,7 @@ import React from 'react';
 import { storiesOf } from '@storybook/react';
 import Template from './components/Template';
 
-storiesOf('Basic usage', module)
+storiesOf('Cronr', module)
   .add('Trigger on 10 milliseconds', () => {
     return <Template pattern="*/10 * * * * * *" />;
   })

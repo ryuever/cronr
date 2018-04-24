@@ -1,17 +1,21 @@
 # cronr &middot; [![npm version](https://img.shields.io/npm/v/cronr.svg?style=flat)](https://www.npmjs.com/package/cronr) [![NPM downloads](https://img.shields.io/npm/dm/cronr.svg?style=flat-square)](http://www.npmtrends.com/cronr)
 
-Inspired from unix `cron` which also privide an time-based job scheduler function. It will follow the basic standard macro. However, it has additional benifits.
+Inspired from unix `cron`, `cronr` is served as an time-based job scheduler which runs on `browser` and `Node.js`. It follows the basic standard macro pattern and makes somehow enhancement.
 
 ---
 
-## feature
+## Feature
 
 - More time control support, even to `millisecond`
 - Works on browser and `Node.js`
 - By default, jobs control support five available actions : `start`, `stop`, `stop`, `resume` and `clear`.
 - Standalone module to help calculate `nextTick` only, which provide a `Iterator` object to fetch.
 
-## installation
+## Online demo
+
+[Cronr stroies -- online samples](https://ryuever.github.io/cronr/)
+
+## Installation
 
 - use `npm` to install
 
@@ -24,6 +28,12 @@ npm install cronr
 ```bash
 yarn add cronr
 ```
+
+## Running on browser
+
+- Downloading the `Cronr.umd.min.js(for time job scheduler)` or `CronrCounter.umd.min.js(to fetch the nextTick only)` from './lib/minified';
+- Add an `<script>` tag which includes the `bundle` file on your page
+- Refer to [Cronr](#cronr) or [CronrCounter](#cronrcounter) for usage detail
 
 ## Cronr
 
