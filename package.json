@@ -1,6 +1,6 @@
 {
   "name": "cronr",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Time-based job scheduler",
   "main": "lib/normal/Cronr.cjs.js",
   "files": [
