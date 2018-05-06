@@ -4,13 +4,14 @@ const path = require('path');
 
 const variants = {
   minified: [true, false],
-  lib: ['Cronr', 'CronrCounter'],
+  lib: ['Cronr', 'CronrCounter', 'CronrWorker'],
   target: ['commonjs2', 'umd'],
 };
 
 const entries = {
   'Cronr': './src/index.ts',
   'CronrCounter': './src/CronrCounter.ts',
+  'CronrWorker': './src/CronrWorker.ts',
 };
 
 const createConfig = options => {

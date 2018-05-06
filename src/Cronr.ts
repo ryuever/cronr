@@ -1,4 +1,3 @@
-import Resolver, { ResolverConstructor } from "./Resolver";
 import CronrCounter from "./CronrCounter";
 import utils from "./utils";
 const { toNum } = utils;
@@ -90,7 +89,6 @@ export default class Cronr {
     this.nextTick = nextTick;
 
     const callback = () => {
-      this.cb.call(this);
       const nextTick = this.iterator.next().value;
 
       if (!this.endTime || this.endTime > nextTick) {
@@ -98,6 +96,8 @@ export default class Cronr {
         this.nextTick = nextTick;
         this.timeoutId = setTimeout(callback, timeout);
       }
+
+      this.cb.call(this);
     };
 
     this.timeoutId = setTimeout(callback, timeout);
