@@ -10,6 +10,7 @@ Inspired from unix `cron`, `cronr` is served as an time-based job scheduler whic
 - Works on browser and `Node.js`
 - By default, jobs control support five available actions : `start`, `stop`, `stop`, `resume` and `clear`.
 - Standalone module to help calculate `nextTick` only, which provide a `Iterator` object to fetch.
+- Add `webWorkers` support, to avoid the `onmessage` handle trigger delay due to the nature of Javascript's single thread.
 
 ## Online demo
 
@@ -42,7 +43,7 @@ Job scheduler, which support `cron` macro pattern and has lots of handful method
 ### - Cronr(pattern: string, callback: function, opts: obj)
 
 | Property | Description | Type | Required|
-| -------- | ----------- | ---- | --- |
+| -------- | ---  -------- | ---- | --- |
 | pattern  | `cron` macro format string | string | yes|
 | callback | Function will be triggerd when time hit `nextTick` | function | yes|
 
@@ -120,6 +121,95 @@ const counter = new CronrCounter({
 const data = counter.result;
 const result = data.next().value;  // '3/3/2019, 12:00:02 AM'
 const result2 = data.next().value; // '3/3/2019, 12:00:05 AM'
+```
+
+## CronrWorker
+
+This is an experimental `feature` which is integrated with `webWorkers`. It coulb be considered as an alternate of `Crorn` module。
+
+### Why using `webWorkers`
+
+```js
+let i = 1;
+const fn = (ts) => {
+  const id = setTimeout(() => {
+    const executedAt = new Date();
+    const diff = executedAt - ts;
+    window.clearTimeout(id);
+    console.log('executedAt ', executedAt, diff);
+    if (i < 10) {
+      fn(ts);
+    }
+    i++;
+  }, 500)
+}
+
+// result
+
+// executedAt  Mon May 07 2018 00:33:38 GMT+0800 (CST) 502
+// executedAt  Mon May 07 2018 00:33:38 GMT+0800 (CST) 1007
+// executedAt  Mon May 07 2018 00:33:39 GMT+0800 (CST) 1509
+// executedAt  Mon May 07 2018 00:33:39 GMT+0800 (CST) 2015
+// executedAt  Mon May 07 2018 00:33:40 GMT+0800 (CST) 2521
+// executedAt  Mon May 07 2018 00:33:40 GMT+0800 (CST) 3027
+// executedAt  Mon May 07 2018 00:33:41 GMT+0800 (CST) 3529
+// executedAt  Mon May 07 2018 00:33:41 GMT+0800 (CST) 4037
+// executedAt  Mon May 07 2018 00:33:42 GMT+0800 (CST) 4538
+// executedAt  Mon May 07 2018 00:33:42 GMT+0800 (CST) 5040
+// executedAt  Mon May 07 2018 00:33:43 GMT+0800 (CST) 5546
+// executedAt  Mon May 07 2018 00:33:43 GMT+0800 (CST) 6052
+// executedAt  Mon May 07 2018 00:33:44 GMT+0800 (CST) 6555
+// executedAt  Mon May 07 2018 00:33:44 GMT+0800 (CST) 7059
+// executedAt  Mon May 07 2018 00:33:45 GMT+0800 (CST) 7564
+// executedAt  Mon May 07 2018 00:33:45 GMT+0800 (CST) 8068
+// executedAt  Mon May 07 2018 00:33:46 GMT+0800 (CST) 8573
+// executedAt  Mon May 07 2018 00:33:46 GMT+0800 (CST) 9080
+// executedAt  Mon May 07 2018 00:33:47 GMT+0800 (CST) 9586
+// executedAt  Mon May 07 2018 00:33:47 GMT+0800 (CST) 10092
+```
+
+According to the running result, As the counter become bigger, the delay will become much bigger. For example, if `count === 10`, the delay is only `40ms`, but when the count is `20`, it become `92`. It is due to the nature of Javascript's single thread, `setTimeout` jobs could not running on concurrency. instead, they could be blockded if the `main thread` is busy on other things.
+
+`webWorkers` provide a method to do a single job in a seperate thread. This job will not be affected by main thread's blocking. Then it also has a hand-on method `postMessage` to communiate with `main thread`.
+
+### -CronrWorker(pattern: string)
+
+| Property | Description | Type | Required|
+| -------- | ----------- | ---- | --- |
+| pattern  | `cron` macro format string | string | yes|
+
+### Basic `CronrWorker` Usage
+
+```js
+import CronrWorker from 'cronr/CronrWorker'
+
+const worker = CronrWorker(pattern);
+worker.onmessage = (e) => {
+  const data = e.data;
+  const { nextTick, triggerAt, hit, status, action } = data;
+
+  if (action === 'trigger') {
+    this.store.set(hit, {
+      triggerAt,
+      nextTick,
+    });
+    this.setState({
+      count: this.state.count + 1,
+      status,
+    });
+  }
+
+  if (action === 'updateStatus') {
+    this.setState({
+      status,
+    });
+  }
+};
+
+worker.onerror = (e) => {
+  const { message } = e;
+  console.log(e.message);
+};
 ```
 
 ## Cronr Macro Pattern
