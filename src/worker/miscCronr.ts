@@ -1190,7 +1190,6 @@ export default () => {
       this.nextTick = nextTick;
 
       const callback = () => {
-        this.cb.call(this);
         const nextTick = this.iterator.next().value;
 
         if (!this.endTime || this.endTime > nextTick) {
@@ -1198,6 +1197,7 @@ export default () => {
           this.nextTick = nextTick;
           this.timeoutId = setTimeout(callback, timeout);
         }
+        this.cb.call(this);
       };
 
       this.timeoutId = setTimeout(callback, timeout);
