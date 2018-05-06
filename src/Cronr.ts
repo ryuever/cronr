@@ -1,4 +1,3 @@
-import Resolver, { ResolverConstructor } from "./Resolver";
 import CronrCounter from "./CronrCounter";
 import utils from "./utils";
 const { toNum } = utils;
