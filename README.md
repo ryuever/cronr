@@ -43,7 +43,7 @@ Job scheduler, which support `cron` macro pattern and has lots of handful method
 ### - Cronr(pattern: string, callback: function, opts: obj)
 
 | Property | Description | Type | Required|
-| -------- | ---  -------- | ---- | --- |
+| -------- | ----------- | ---- | --- |
 | pattern  | `cron` macro format string | string | yes|
 | callback | Function will be triggerd when time hit `nextTick` | function | yes|
 
@@ -168,7 +168,9 @@ const fn = (ts) => {
 // executedAt  Mon May 07 2018 00:33:47 GMT+0800 (CST) 10092
 ```
 
-According to the running result, As the counter become bigger, the delay will become much bigger. For example, if `count === 10`, the delay is only `40ms`, but when the count is `20`, it become `92`. It is due to the nature of Javascript's single thread, `setTimeout` jobs could not running on concurrency. instead, they could be blockded if the `main thread` is busy on other things.
+According to the running result, As the counter become bigger, the delay will become much longer.
+
+For example, if `count === 10`, the delay is only `40ms`, but when the count become `20`, the delay is `92`. It is due to the nature of Javascript's single thread, `setTimeout` jobs could not running on concurrency. instead, they could be blockded if the `main thread` is busy on other things.
 
 `webWorkers` provide a method to do a single job in a seperate thread. This job will not be affected by main thread's blocking. Then it also has a hand-on method `postMessage` to communiate with `main thread`.
 
