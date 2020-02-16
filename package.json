@@ -33,12 +33,6 @@
   "author": "youchao.liu",
   "license": "MIT",
   "devDependencies": {
-    "@storybook/addon-actions": "4.0.0-alpha.3",
-    "@storybook/addon-console": "^1.0.0",
-    "@storybook/addon-links": "4.0.0-alpha.3",
-    "@storybook/addon-notes": "4.0.0-alpha.3",
-    "@storybook/addons": "4.0.0-alpha.3",
-    "@storybook/react": "4.0.0-alpha.3",
     "add-module-exports-webpack-plugin": "^0.1.0",
     "babel-core": "^6.26.0",
     "babel-jest": "^22.1.0",
@@ -47,7 +41,6 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.24.1",
-    "husky": "^0.15.0-rc.13",
     "jest": "^21.2.1",
     "lint-staged": "^7.0.4",
     "parallel-webpack": "^2.3.0",
@@ -75,6 +68,13 @@
     "url": "git+https://github.com/ryuever/cronr.git"
   },
   "dependencies": {
+    "@storybook/addon-actions": "^5.3.13",
+    "@storybook/addon-console": "^1.2.1",
+    "@storybook/addon-links": "^5.3.13",
+    "@storybook/addon-notes": "^5.3.13",
+    "@storybook/addons": "^5.3.13",
+    "@storybook/react": "^5.3.13",
+    "husky": "^4.2.3",
     "ts-loader": "^4.2.0",
     "webpack": "^4.6.0"
   },
